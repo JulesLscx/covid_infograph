@@ -1,3 +1,7 @@
+import pymongo as pm
+from urllib.parse import quote_plus
+
+
 class SingletonMongoConnection:
     """Classe implémentant le design pattern Singleton pour une connexion MongoDB unique.
 
