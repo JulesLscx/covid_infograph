@@ -21,18 +21,11 @@ def iterating_over_values(path, sheet_name):
             values_only=False):
         l = []
         for v in value:
-            l.append(v.value)
+            if isinstance(v.value, str):
+                l.append(v.value.encode("UTF-8"))
+            else:
+                l.append(v.value)
         print(l)
-
-
-def connection():
-    username = quote_plus('<Jules>')
-    password = quote_plus('<C6IyTitjpiYeq4t4>')
-    cluster = '<SAE>'
-    uri = 'mongodb+srv://' + username + ':' + password + '@' + cluster + \
-        '.x1hujrr.mongodb.net'
-    client = pm.MongoClient(uri)
-    return client.test
 
 
 def __main__():
@@ -40,8 +33,12 @@ def __main__():
     file_path = os.path.join(
         file_dir, 'excels', '20200601_IRIT_clinicalTrials+publications.xlsx')
     iterating_over_values(
-        file_path, Keywords.WS_CLINICALTRIALS_OBS.value)
+        file_path, Keywords.WS_CLINICALTRIALS_RAND.value)
     # print(db)
+
+
+def insertAllExcel(path):
+    return path
 
 
 __main__()
