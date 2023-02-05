@@ -8,7 +8,8 @@ from urllib.parse import quote_plus
 # file = pd.read_excel(
 #     './others/20200601_IRIT_clinicalTrials+publications.xlsx', engine='openpyxl')
 
-
+# La fonction doit retourner une liste de dictionnaires avec les données de chaque ligne pour
+# insérer dans une base mongoDB
 def iterating_over_values(path, sheet_name):
     workbook = load_workbook(filename=path)
     if sheet_name not in workbook.sheetnames:
@@ -28,17 +29,35 @@ def iterating_over_values(path, sheet_name):
         print(l)
 
 
-def __main__():
+def get_maximum_rows(*, sheet_object):
+    rows = 0
+    for max_row, row in enumerate(sheet_object, 1):
+        if not all(col.value is None for col in row):
+            rows += 1
+    return rows
+
+
+# Génère les tests pour la fonction foundlastrow et foundlastcol
+
+
+def test_foundlastrow():
     file_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(
         file_dir, 'excels', '20200601_IRIT_clinicalTrials+publications.xlsx')
-    iterating_over_values(
-        file_path, Keywords.WS_CLINICALTRIALS_RAND.value)
+    workbook = load_workbook(filename=file_path)
+    sheet = workbook[Keywords.WS_CLINICALTRIALS_OBS.value]
+    last = get_maximum_rows(sheet_object=sheet)
+    print(last, sheet.max_column)
+
+
+def __main__():
+    # file_dir = os.path.dirname(os.path.abspath(__file__))
+    # file_path = os.path.join(
+    #     file_dir, 'excels', '20200601_IRIT_clinicalTrials+publications.xlsx')
+    # iterating_over_values(
+    #     file_path, Keywords.WS_CLINICALTRIALS_RAND.value)
     # print(db)
-
-
-def insertAllExcel(path):
-    return path
+    test_foundlastrow()
 
 
 __main__()
