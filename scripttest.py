@@ -1,4 +1,5 @@
 import datetime
+import sys
 from variables import Keywords
 import pymongo as pm
 from openpyxl import load_workbook, Workbook
@@ -64,8 +65,6 @@ def create_dic_by_sheet(*, sheet_object):
         for i, cell in enumerate(row):
             if isinstance(cell.value, str):
                 dic[column_names[i]] = cell.value.encode('utf-8')
-            elif isinstance(cell.value, datetime.datetime):
-                dic[column_names[i]] = cell.value.strftime('%Y-%m-%d')
             else:
                 dic[column_names[i]] = cell.value
         result.append(dic)
@@ -103,7 +102,7 @@ def load_excel_file():
     file_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(
         file_dir, 'excels', '20200601_IRIT_clinicalTrials+publications.xlsx')
-    workbook = load_workbook(filename=file_path)
+    workbook = load_workbook(filename=file_path,)
     return workbook
 
 
@@ -115,12 +114,12 @@ def dump_all_excel_in_mongo():
     workbook = load_excel_file()
     for i, sheet in enumerate(sheets):
         dic_list = create_dic_by_sheet(sheet_object=workbook[sheet])
-        insert_dic_in_mongo(
-            dic_list=dic_list, collection=smc.get_db()[collections[i]])
+        smc.get_db()[collections[i]].insert_many(dic_list)
 
 
 def test_insert_one_dic_in_mongo():
-    dic = {'_id': 'test', 'test': 'test'}
+    dic = create_dic_by_sheet(sheet_object=load_excel_file()[
+                              Keywords.WS_CLINICALTRIALS_OBS.value])[0]
     insert_one_dic_in_mongo(
         dic=dic, collection=Keywords.T_CLINICALTRIALS_OBS.value)
 
@@ -130,9 +129,8 @@ def insert_one_dic_in_mongo(*, dic, collection):
 
 
 def __main__():
-    # init_collections()
-    create_dic_by_sheet(sheet_object=load_excel_file()[
-                        Keywords.WS_CLINICALTRIALS_OBS.value])
+    init_collections()
+    dump_all_excel_in_mongo()
 
 
 __main__()
