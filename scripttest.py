@@ -83,8 +83,6 @@ def create_dic_by_sheet(*, sheet_object):
                         string=cell.value)
                 else:
                     dic[column_names[i]] = None
-            if isinstance(cell.value, str):
-                dic[column_names[i]] = cell.value.encode('utf-8')
             else:
                 dic[column_names[i]] = cell.value
         result.append(dic)
@@ -139,9 +137,8 @@ def dump_all_excel_in_mongo():
 
 def test_insert_one_dic_in_mongo():
     dic = create_dic_by_sheet(sheet_object=load_excel_file()[
-                              Keywords.WS_CLINICALTRIALS_OBS.value])[0]
-    insert_one_dic_in_mongo(
-        dic=dic, collection=Keywords.T_CLINICALTRIALS_OBS.value)
+                              Keywords.WS_CLINICALTRIALS_OBS.value])[1:10]
+    print(dic)
 
 
 def insert_one_dic_in_mongo(*, dic, collection):
@@ -149,8 +146,7 @@ def insert_one_dic_in_mongo(*, dic, collection):
 
 
 def __main__():
-    init_collections()
-    dump_all_excel_in_mongo()
+    test_insert_one_dic_in_mongo()
 
 
 __main__()
