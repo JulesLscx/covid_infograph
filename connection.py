@@ -12,6 +12,7 @@ class SingletonMongoConnection:
     """
 
     __instance = None
+    client = None
 
     @staticmethod
     def get_instance():
@@ -30,20 +31,12 @@ class SingletonMongoConnection:
         if SingletonMongoConnection.__instance is not None:
             raise Exception("Cette classe est un singleton !")
         else:
-            username = quote_plus('<Jules>')
-            password = quote_plus('<C6IyTitjpiYeq4t4>')
-            cluster = '<SAE>'
-            uri = 'mongodb+srv://' + username + ':' + password + '@' + cluster + \
-                '.x1hujrr.mongodb.net'
-            self.client = pm.MongoClient(uri)
+
+            client = pm.MongoClient(
+                "mongodb+srv://Jules:C6IyTitjpiYeq4t4@sae.x1hujrr.mongodb.net/?retryWrites=true&w=majority")
+            self.client = client
             SingletonMongoConnection.__instance = self
 
-
-def connection():
-    """Récupère la collection test de la connexion MongoDB.
-
-    Retourne:
-        pymongo.collection.Collection: La collection test de la connexion MongoDB.
-
-    """
-    return SingletonMongoConnection.get_instance().client.test
+    @staticmethod
+    def get_db():
+        return SingletonMongoConnection.get_instance().client['covid_infograph']
