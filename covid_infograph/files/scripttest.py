@@ -1,11 +1,9 @@
-import datetime
-import sys
-from variables import Keywords
+from covid_infograph.files.variables import Keywords
 import pymongo as pm
 from openpyxl import load_workbook, Workbook
 import os
 from urllib.parse import quote_plus
-from connection import SingletonMongoConnection as smc
+from covid_infograph.files.connection import SingletonMongoConnection as smc
 import pandas as pd
 from io import StringIO
 
@@ -147,6 +145,3 @@ def insert_one_dic_in_mongo(*, dic, collection):
 
 def __main__():
     test_insert_one_dic_in_mongo()
-
-
-__main__()
