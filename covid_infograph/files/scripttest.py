@@ -1,9 +1,11 @@
-from covid_infograph.files.variables import Keywords
+# ' -*- coding: utf-8 -*-
+import json
+from .variables import Keywords
 import pymongo as pm
 from openpyxl import load_workbook, Workbook
 import os
 from urllib.parse import quote_plus
-from covid_infograph.files.connection import SingletonMongoConnection as smc
+from .connection import SingletonMongoConnection as smc
 import pandas as pd
 from io import StringIO
 
@@ -20,7 +22,7 @@ def get_maximum_rows(*, sheet_object):
     return rows
 
 
-def str_to_dict(*, string):
+def str_to_dict(*, string, last__id):
     """Convertit une string en dictionnaire
 
     Args:
@@ -29,20 +31,16 @@ def str_to_dict(*, string):
     Returns:
         dict: dictionnaire
     """
-    buffer = StringIO(string)
-    df = pd.read_csv(buffer, sep=',')
-    df.to_dict()
-# Génère les tests pour la fonction foundlastrow et foundlastcol
+    string = string.replace("'", '"')
+    string = string.replace('None', 'null')
+    try:
+        dic = json.loads(string)
+    except:
+        if last__id:
+            print(last__id)
+        dic = {}
+    return dic
 
-
-# def test_foundlastrow():
-#     file_dir = os.path.dirname(os.path.abspath(__file__))
-#     file_path = os.path.join(
-#         file_dir, 'excels', '20200601_IRIT_clinicalTrials+publications.xlsx')
-#     workbook = load_workbook(filename=file_path)
-#     sheet = workbook[Keywords.WS_CLINICALTRIALS_OBS.value]
-#     last = get_maximum_rows(sheet_object=sheet)
-#     print(last, sheet.max_column)
 
 def test_get_column_names():
     workbook = load_excel_file()
@@ -51,14 +49,23 @@ def test_get_column_names():
     print(column_names)
 
 
-def test_create_dic_by_sheet():
-    workbook = load_excel_file()
-    sheet = workbook[Keywords.WS_CLINICALTRIALS_OBS.value]
-    column_names = create_dic_by_sheet(sheet_object=sheet)
-    print(column_names)
+def create_dic_by_sheet(sheet_object: object) -> dict:
+    column_names = {}
+    for cell in sheet_object[1]:
+        if cell.value != None:
+            column_names[cell.value] = cell.column
+    return column_names
 
 
-def get_column_names(*, sheet_object):
+def get_column_names(*, sheet_object) -> list[str]:
+    """Get column names from the first row of a sheet object.
+
+    Args:
+        sheet_object (Workbook.worksheet.worksheet.Worksheet): The sheet object to get the column names from.
+
+    Returns:
+        list[str]: A list of column names.
+    """
     column_names = []
     for row in sheet_object.iter_rows(min_row=1, max_row=1, min_col=1, max_col=sheet_object.max_column):
         for cell in row:
@@ -72,13 +79,13 @@ def get_column_names(*, sheet_object):
 def create_dic_by_sheet(*, sheet_object):
     result = []
     column_names = get_column_names(sheet_object=sheet_object)
-    for row in sheet_object.iter_rows(min_row=1, max_row=get_maximum_rows(sheet_object=sheet_object), min_col=1, max_col=sheet_object.max_column):
+    for row in sheet_object.iter_rows(min_row=2, max_row=get_maximum_rows(sheet_object=sheet_object), min_col=1, max_col=sheet_object.max_column):
         dic = {}
         for i, cell in enumerate(row):
             if column_names[i] == 'interventions':
                 if cell.value is not None:
                     dic[column_names[i]] = str_to_dict(
-                        string=cell.value)
+                        string=cell.value, last__id=dic.get('_id'))
                 else:
                     dic[column_names[i]] = None
             else:
@@ -115,10 +122,22 @@ def init_collections():
 
 
 def load_excel_file():
-    file_dir = os.path.dirname(os.path.abspath(__file__))
+    try:
+        file_dir = os.path.dirname(os.path.abspath(__file__))
+    except NameError:
+        file_dir = os.getcwd()
+
     file_path = os.path.join(
         file_dir, 'excels', '20200601_IRIT_clinicalTrials+publications.xlsx')
-    workbook = load_workbook(filename=file_path,)
+
+    # Copilot ouvre le fichier en utf-8
+    try:
+        workbook = load_workbook(filename=file_path, read_only=True)
+        workbook.encoding = 'utf-8'
+    except FileNotFoundError:
+        print('Could not find the file')
+        workbook = None
+
     return workbook
 
 
@@ -144,4 +163,18 @@ def insert_one_dic_in_mongo(*, dic, collection):
 
 
 def __main__():
-    test_insert_one_dic_in_mongo()
+    init_collections()
+    dump_all_excel_in_mongo()
+    # test = create_dic_by_sheet(sheet_object=load_excel_file()[
+    #                            Keywords.WS_CLINICALTRIALS_OBS.value])
+
+
+if __name__ == '__main__':
+    __main__()
+
+# '''
+ # File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.2288.0_x64__qbz5n2kfra8p0\lib\encodings\cp1252.py", line 19, in encode
+#    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+# UnicodeEncodeError: 'charmap' codec can't encode character '\u2265' in position 1404: character maps to <undefined>
+# How to solve this problem?
+# answer:
