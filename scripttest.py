@@ -6,6 +6,8 @@ from openpyxl import load_workbook, Workbook
 import os
 from urllib.parse import quote_plus
 from connection import SingletonMongoConnection as smc
+import pandas as pd
+from io import StringIO
 
 
 # file = pd.read_excel(
@@ -20,6 +22,18 @@ def get_maximum_rows(*, sheet_object):
     return rows
 
 
+def str_to_dict(*, string):
+    """Convertit une string en dictionnaire
+
+    Args:
+        string (str): string à convertir
+
+    Returns:
+        dict: dictionnaire
+    """
+    buffer = StringIO(string)
+    df = pd.read_csv(buffer, sep=',')
+    df.to_dict()
 # Génère les tests pour la fonction foundlastrow et foundlastcol
 
 
@@ -63,6 +77,12 @@ def create_dic_by_sheet(*, sheet_object):
     for row in sheet_object.iter_rows(min_row=1, max_row=get_maximum_rows(sheet_object=sheet_object), min_col=1, max_col=sheet_object.max_column):
         dic = {}
         for i, cell in enumerate(row):
+            if column_names[i] == 'interventions':
+                if cell.value is not None:
+                    dic[column_names[i]] = str_to_dict(
+                        string=cell.value)
+                else:
+                    dic[column_names[i]] = None
             if isinstance(cell.value, str):
                 dic[column_names[i]] = cell.value.encode('utf-8')
             else:
