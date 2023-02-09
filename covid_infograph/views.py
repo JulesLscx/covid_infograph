@@ -10,7 +10,7 @@ from django.template import loader
 
 def index(request):
     cursor = smc.get_db()[
-        Keywords.T_PUBLICATION_OBS.value].find().limit(1000)
+        Keywords.T_CLINICALTRIALS_OBS.value].find().limit(100)
     list_cursor = list(cursor)
     template = loader.get_template('page1.html')
     context = {'data_base': dumps(list_cursor, indent=2)}
