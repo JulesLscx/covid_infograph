@@ -16,7 +16,7 @@ Including another URLconf
 from django.urls import path
 
 from . import views
-
+app_name = 'covid_infograph'
 urlpatterns = [
-    path('test/', views.index, name='index'),
+    path('display/<int:page>', views.display_data, name='display_data'),
 ]
