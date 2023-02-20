@@ -1,5 +1,5 @@
 import Handsontable from "handsontable";
-import { SELECTED_CLASS, ODD_ROW_CLASS } from "./constants";
+import { SELECTED_CLASS, ODD_ROW_CLASS } from "/js/constants";
 
 const headerAlignments = new Map([
   ["9", "htCenter"],

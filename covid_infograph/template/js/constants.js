@@ -1,4 +1,4 @@
-import datajson from './index.html';
+import datajson from '/template/index.html';
 export const data = json2array(datajson);
 function json2array(json){
     var result = [];

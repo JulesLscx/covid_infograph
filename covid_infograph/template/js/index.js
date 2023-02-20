@@ -2,14 +2,12 @@ import Handsontable from "handsontable";
 import "handsontable/dist/handsontable.min.css";
 import "pikaday/css/pikaday.css";
 
-import { data } from "./constants";
-import { progressBarRenderer, starRenderer } from "./customRenderers";
-
+import { data } from "/js/constants";
 import {
   alignHeaders,
   addClassesToRows,
   changeCheckboxCell
-} from "./hooksCallbacks";
+} from "/js/hooksCallbacks";
 
 const example = document.getElementById("handsontable");
 

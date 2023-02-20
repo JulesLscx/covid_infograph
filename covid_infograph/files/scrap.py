@@ -2,9 +2,14 @@ import requests
 import pandas as pd
 from openpyxl import load_workbook
 from variables import Keywords
-wb = load_workbook('./excels/20200601_IRIT_clinicalTrials+publications.xlsx')
+import pathlib
+
+path = pathlib.Path(__file__).parent.absolute()
+wb = load_workbook(filename=path.joinpath(
+    './excels/20200601_IRIT_clinicalTrials+publications.xlsx'))
 ws = wb[Keywords.WS_CLINICALTRIALS_OBS.value]
 df = pd.DataFrame(ws.values)
+print(df.head())
 records = []
 
 
@@ -27,9 +32,10 @@ def get_record(row):
         page = get_page(link)
         doi = get_doi(page)
         if doi:
-            return {'registry': registry, 'doi': doi}
+            return {'_id': idd, 'registry': registry, 'doi': doi}
     except Exception as e:
         print(f"Failed to get record for {registry}: {e}")
+        pass
     return None
 
 
@@ -61,6 +67,5 @@ for index, row in df.iterrows():
         pass
 
 
-def __main__():
-    df_records = pd.DataFrame(records)
-    df_records.to_excel("records.xlsx", index=False)
+df_records = pd.DataFrame(records)
+df_records.to_excel("records.xlsx", index=False)

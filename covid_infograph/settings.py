@@ -55,7 +55,7 @@ ROOT_URLCONF = 'covid_infograph.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(COVID_INFOGRAPH_DIR), os.path.join(COVID_INFOGRAPH_DIR, "template", "html")],
+        'DIRS': [os.path.join(COVID_INFOGRAPH_DIR, "template", "components"), os.path.join(COVID_INFOGRAPH_DIR, "template", "html")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -116,8 +116,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
-
+STATIC_URL = '/covid_infograph/template/'
+STATICFILES_DIRS = (
+    os.path.join(COVID_INFOGRAPH_DIR, "template"),
+)
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 

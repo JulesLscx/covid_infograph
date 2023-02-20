@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 {{ data_base|json_script:"data_base" }}
+{% load static %}
+{% include 'accueil.html'%}
 <script>
     const datajson = JSON.parse(eval(document.getElementById('data_base').textContent));
 </script>
@@ -8,12 +10,12 @@
 <head>
     <title>Handsontable Vanilla Sandbox</title>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="src/styles.css" />
+    <link rel="stylesheet" href="{% static '/css/style.css' %}" />
 </head>
 
 <body>
     <div id="handsontable"></div>
-    <script src="src/index.js"></script>
+    <script src="{% static '/js/index.js' %}"></script>
 </body>
 
 </html>

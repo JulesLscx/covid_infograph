@@ -1,6 +1,16 @@
 /*
   A stylesheet customizing app (custom renderers)
 */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    list-style: none;
+    font-family: 'Roboto', sans-serif;
+}
 
 table.htCore td.star {
     color: #fcb515;
@@ -52,4 +62,42 @@ table.htCore tr.selected td {
 
 [data-color="orange"] {
     background: #fcb515;
+}
+
+/*
+Make sticky nav template with a in a nav
+*/
+.nav-item {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgb(47, 180, 220);
+    text-decoration: none;
+    color: #ffff;
+}
+
+.current {
+    color: #333;
+}
+
+.nav-item:hover {
+    color: #333;
+}
+
+.nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: center;
+    background: rgb(47, 180, 220);
+    height: 10vh;
+    padding: 0 20px;
 }
