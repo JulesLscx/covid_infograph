@@ -18,5 +18,8 @@ from django.urls import path
 from . import views
 app_name = 'covid_infograph'
 urlpatterns = [
+    path('display/<int:page>/<int:limit>',
+         views.display_data, name='display_data'),
     path('display/<int:page>', views.display_data, name='display_data'),
+    path('', views.accueil, name='accueil'),
 ]

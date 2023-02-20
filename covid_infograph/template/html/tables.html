@@ -4,13 +4,14 @@
 <head>
     <title>Ag-Grid Basic Example</title>
     <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
 </head>
 
 <body>
     <div id="example-table"></div>
-    <div id="myGrid" style="height: 200px; width:90%;" class="ag-theme-alpine"></div>
+    <div id="myGrid" style="height: 80%; width:90%;" class="ag-theme-alpine"></div>
 </body>
 <script>
     const rowData = JSON.parse(eval(document.getElementById('data_base').textContent));
@@ -84,7 +85,7 @@
         layout: "fitColumns",
         rowClickPopup: rowPopupFormatter, //add click popup to row
         columns: [
-            { title: "id", field: "id", headerPopup: headerPopupFormatter, headerPopupIcon: "<i class='fas fa-filter' title='Filter column'></i>", headerFilter: emptyHeaderFilter, headerFilterFunc: "like" },
+            { title: "_id", field: "_id", headerPopup: headerPopupFormatter, headerPopupIcon: "<i class='fas fa-filter' title='Filter column'></i>", headerFilter: emptyHeaderFilter, headerFilterFunc: "like" }
         ],
     });
 

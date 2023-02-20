@@ -6,6 +6,9 @@ name = "pypi"
 [packages]
 django = "*"
 pymongo = "*"
+pandas = "*"
+openpyxl = "*"
+requests = "*"
 
 [dev-packages]
 

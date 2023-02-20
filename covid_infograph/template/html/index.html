@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+{{ data_base|json_script:"data_base" }}
+<script>
+    const datajson = JSON.parse(eval(document.getElementById('data_base').textContent));
+</script>
+
+<head>
+    <title>Handsontable Vanilla Sandbox</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="src/styles.css" />
+</head>
+
+<body>
+    <div id="handsontable"></div>
+    <script src="src/index.js"></script>
+</body>
+
+</html>

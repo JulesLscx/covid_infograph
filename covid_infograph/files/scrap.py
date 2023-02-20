@@ -1,7 +1,10 @@
 import requests
 import pandas as pd
-df = pd.read_csv('1 - ClinicalTrials_ObsStudies.csv')
-
+from openpyxl import load_workbook
+from variables import Keywords
+wb = load_workbook('./excels/20200601_IRIT_clinicalTrials+publications.xlsx')
+ws = wb[Keywords.WS_CLINICALTRIALS_OBS.value]
+df = pd.DataFrame(ws.values)
 records = []
 
 
@@ -25,12 +28,10 @@ def get_record(row):
         doi = get_doi(page)
         if doi:
             return {'registry': registry, 'doi': doi}
-    except:
-        pass
+    except Exception as e:
+        print(f"Failed to get record for {registry}: {e}")
     return None
 
-
-df = pd.read_csv('1 - ClinicalTrials_ObsStudies.csv')
 
 records = []
 for index, row in df.iterrows():
@@ -55,7 +56,11 @@ for index, row in df.iterrows():
             records.append({'id': registry, 'doi': doi})
 
         print(registry)
-    except:
+    except Exception as e:
+        print(f"Failed to get record for {registry}: {e}")
         pass
-df_records = pd.DataFrame(records)
-df_records.to_excel("records.xlsx", index=False)
+
+
+def __main__():
+    df_records = pd.DataFrame(records)
+    df_records.to_excel("records.xlsx", index=False)
