@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-{{ data_base|json_script:"data_base" }}
 {% load static %}
 {% include 'accueil.html'%}
 <script>
@@ -14,6 +13,7 @@
 </head>
 
 <body>
+
     <div id="handsontable"></div>
     <script src="{% static '/js/index.js' %}"></script>
 </body>
