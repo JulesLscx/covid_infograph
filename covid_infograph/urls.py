@@ -25,4 +25,5 @@ urlpatterns = [
     path('display/<int:page>', views.display_data, name='display_data'),
     path('display/<int:page>/<int:limit>',
          views.display_data, name='display_data'),
+    path('api/<int:page>', views.display_data_filter, name='display_data_filter')
 ]
