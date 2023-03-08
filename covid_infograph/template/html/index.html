@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
 {% load static %}
-{% include 'accueil.html'%}
-<script>
-    const datajson = JSON.parse(eval(document.getElementById('data_base').textContent));
-</script>
+{% block javascript %}
+    <script>
+        let num_page = {{ page }};
+        console.log(num_page);
+    </script>
+{% endblock %}
 
 <head>
-    <title>Handsontable Vanilla Sandbox</title>
+    <title> {{titre}}</title>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="{% static '/css/style.css' %}" />
 </head>
@@ -15,6 +17,7 @@
 <body>
 
     <div id="handsontable"></div>
+
     <script src="{% static '/js/index.js' %}"></script>
 </body>
 

@@ -19,11 +19,11 @@ from . import views
 app_name = 'covid_infograph'
 urlpatterns = [
     path('get/<int:page>/<int:limit>',
-         views.find_all, name='display_data'),
-    path('get/<int:page>', views.find_all, name='display_data'),
+         views.find_all, name='get_data'),
+    path('get/<int:page>', views.find_all, name='get_data'),
     path('', views.accueil, name='accueil'),
     path('display/<int:page>', views.display_data, name='display_data'),
     path('display/<int:page>/<int:limit>',
-         views.display_data, name='display_data'),
+         views.display_data, name='display_data_limit'),
     path('api/<int:page>', views.display_data_filter, name='display_data_filter')
 ]

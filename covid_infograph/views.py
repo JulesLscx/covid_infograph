@@ -31,7 +31,21 @@ def find_all(request, page, limit=100):
 def display_data(request, page, limit=100):
     if page not in range(1, 5):
         return HttpResponse("Page not found")
-    return HttpResponse(render(request, 'index.html', {'page': page, 'limit': limit}))
+    if page == 1:
+        titre = Keywords.WS_CLINICALTRIALS_OBS.value
+    elif page == 2:
+        titre = Keywords.WS_CLINICALTRIALS_RAND.value
+    elif page == 3:
+        titre = Keywords.WS_PUBLICATION_OBS.value
+    elif page == 4:
+        titre = Keywords.WS_PUBLICATION_RAND.value
+    context = {
+        'page': page,
+        'limit': limit,
+        'date': datetime.datetime.now(),
+        'titre': titre
+    }
+    return HttpResponse(render(request, 'index.html', context))
 
 
 @csrf_exempt
