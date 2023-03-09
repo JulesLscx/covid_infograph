@@ -1,12 +1,8 @@
 <!DOCTYPE html>
 <html>
 {% load static %}
-{% block javascript %}
-    <script>
-        let num_page = {{ page }};
-        console.log(num_page);
-    </script>
-{% endblock %}
+{% include 'accueil.html' %}
+<link href="{% static '/dist/css/tabulator.css' %}" rel="stylesheet">
 
 <head>
     <title> {{titre}}</title>
@@ -15,10 +11,52 @@
 </head>
 
 <body>
+    <div>
+    <button id="download-csv">Download CSV</button>
+    <button id="download-json">Download JSON</button>
+    <button id="download-xlsx">Download XLSX</button>
+    <button id="download-pdf">Download PDF</button>
+    <button id="download-html">Download HTML</button>
+</div>
+    <div id="example-table"></div>
 
-    <div id="handsontable"></div>
-
-    <script src="{% static '/js/index.js' %}"></script>
+    <!-- <script src="{% static '/js/index.js' %}"></script> -->
 </body>
 
 </html>
+{% block javascript %}
+ <script type="text/javascript" src="{% static '/dist/js/tabulator.js' %}"></script>
+    <script>
+      function get_dictio
+    function make_all(){
+        let num_page = {{ page }};
+        let limit = {{ limit }};
+        let url = "{% url 'get_data' page limit  %}";
+        const Http = new XMLHttpRequest();
+        Http.open("GET", url);
+        Http.send();
+          Http.onreadystatechange = (e) => {
+    if (Http.readyState === XMLHttpRequest.DONE) {
+      if (Http.status === 200) {
+        try {
+          const tabledata = JSON.parse(Http.responseText);
+          console.log(tabledata);
+          var table = new Tabulator("#example-table", {
+            data:tabledata, //assign data to table
+            autoColumns:true, //create columns from data field names
+            renderHorizontal:"virtual",
+            height:"80vh",
+            dataTree:true,
+            });
+        } catch (err) {
+          console.error("Error parsing JSON data:", err);
+        }
+      } else {
+        console.error("Error retrieving data. Status code:", Http.status);
+      }
+    }
+  }
+  }
+  make_all();
+    </script>
+{% endblock %}

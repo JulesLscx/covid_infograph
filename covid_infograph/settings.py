@@ -119,6 +119,7 @@ USE_TZ = True
 STATIC_URL = '/covid_infograph/template/'
 STATICFILES_DIRS = (
     os.path.join(COVID_INFOGRAPH_DIR, "template"),
+    os.path.join(COVID_INFOGRAPH_DIR, "template", "js", "tabulator-master"),
 )
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
