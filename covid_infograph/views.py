@@ -69,6 +69,23 @@ def display_data_filter(request, page, limit=100):
     return HttpResponse(dumps(list(cursor)))
 
 
+def display_graph(request, page, limit=100):
+    if page == 1:
+        value = Keywords.T_CLINICALTRIALS_OBS.value
+    elif page == 2:
+        value = Keywords.T_CLINICALTRIALS_RAND.value
+    elif page == 3:
+        value = Keywords.T_PUBLICATION_OBS.value
+    elif page == 4:
+        value = Keywords.T_PUBLICATION_RAND.value
+    else:
+        return HttpResponse(
+            "Page not found, please check the url check the documentation")
+    cursor = smc.get_db()[value].find({'date': 1})
+    list_cursor = list(cursor)
+    return HttpResponse(render(request, 'graph.html', {'dates': list_cursor, 'page': page}))
+
+
 def filter_builder(filters):
     filters = []
     return filters

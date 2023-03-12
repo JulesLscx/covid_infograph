@@ -12,45 +12,6 @@
     font-family: 'Roboto', sans-serif;
 }
 
-table.htCore td.star {
-    color: #fcb515;
-}
-
-table.htCore tr.odd td {
-    background: #fafbff;
-}
-
-table.htCore td .progressBar {
-    background: #37bc6c;
-    height: 10px;
-}
-
-table.htCore tr.selected td {
-    background: #edf3fd;
-}
-
-/*
-  A stylesheet customizing Handsontable style
-*/
-
-.collapsibleIndicator {
-    text-align: center;
-}
-
-.handsontable .htRight .changeType {
-    margin: 3px 1px 0 13px;
-}
-
-.handsontable .green {
-    background: #37bc6c;
-    font-weight: bold;
-}
-
-.handsontable .orange {
-    background: #fcb515;
-    font-weight: bold;
-}
-
 .btn {
     padding: 20px;
     font: 1.4em sans-serif;
@@ -74,7 +35,7 @@ Make sticky nav template with a in a nav
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgb(47, 180, 220);
+    background: #627ce0;
     text-decoration: none;
     color: #ffff;
 }
@@ -97,7 +58,8 @@ Make sticky nav template with a in a nav
     flex-wrap: wrap;
     align-items: center;
     align-content: center;
-    background: rgb(47, 180, 220);
+    background: #627ce0;
     height: 10vh;
+    max-height: 70px;
     padding: 0 20px;
 }

@@ -2,7 +2,7 @@
 <html>
 {% load static %}
 {% include 'accueil.html' %}
-<link href="{% static '/dist/css/tabulator.css' %}" rel="stylesheet">
+<link href="{% static '/dist/css/tabulator_modern.min.css' %}" rel="stylesheet">
 
 <head>
     <title> {{titre}}</title>
@@ -18,6 +18,9 @@
     <button id="download-pdf">Download PDF</button>
     <button id="download-html">Download HTML</button>
 </div>
+<div>
+  <button id="reload" onclick="make_all()">Reload</button>
+</div>
     <div id="example-table"></div>
 
     <!-- <script src="{% static '/js/index.js' %}"></script> -->
@@ -25,38 +28,116 @@
 
 </html>
 {% block javascript %}
+  <script src="{% static 'js/luxon.js' %}"></script>
  <script type="text/javascript" src="{% static '/dist/js/tabulator.js' %}"></script>
-    <script>
+  <script type="text/javascript" src="{% static '/js/table_lib.js' %}"></script>
+  <script>
+    function sub_table_render(row, index) {
+  // Vérifiez si la ligne est déjà ouverte
+  if (row.getTreeParent()) {
+    row.getTreeParent().toggle();
+  } else {
+    // Sinon, chargez les données et ouvrez la ligne
+    var rowData = row.getData();
+    var subTableData = rowData.interventions;
 
-    function make_all(){
-        let num_page = {{ page }};
-        let limit = {{ limit }};
-        let url = "{% url 'get_data' page limit  %}";
-        const Http = new XMLHttpRequest();
-        Http.open("GET", url);
-        Http.send();
-          Http.onreadystatechange = (e) => {
-    if (Http.readyState === XMLHttpRequest.DONE) {
-      if (Http.status === 200) {
-        try {
-          const tabledata = JSON.parse(Http.responseText);
-          console.log(tabledata);
-          var table = new Tabulator("#example-table", {
-            data:tabledata, //assign data to table
-            autoColumns:true, //create columns from data field names
-            renderHorizontal:"virtual",
-            height:"80vh",
-            dataTree:true,
-            });
-        } catch (err) {
-          console.error("Error parsing JSON data:", err);
+    // Créez un élément de tableau pour la sous-table
+    var subTableEl = document.createElement("div");
+
+    // Créez une nouvelle sous-table avec les données et l'élément du tableau créé ci-dessus
+    var subTable = new Tabulator(subTableEl, {
+      data: subTableData,
+      layout: "fitColumns",
+      autoColumns: true,
+    });
+
+    // Ajoutez la sous-table à la ligne et ouvrez-la
+    row.toggle();
+    row.getElement().appendChild(subTableEl);
+  }
+}
+
+function onclick_render(cell, formatterParams, onRendered) {
+  const id = row.getData().id;
+    $(".subTable" + id + "").toggle();
+}
+
+
+    function make_all() {
+    let num_page = {{ page }};
+    let limit = {{ limit }};
+    let url = "{% url 'get_data' page limit  %}";
+    const Http = new XMLHttpRequest();
+    Http.open("GET", url);
+    Http.send();
+    Http.onreadystatechange = function() {
+        if (this.readyState === 4 && this.status === 200) {
+            try {
+                const tabledata = JSON.parse(Http.responseText.replace(/\n/g, ""));
+                console.log(tabledata);
+                let col = get_column_dict(num_page);
+                var table = new Tabulator("#example-table", {
+                    data: tabledata, //assign data to table
+                    movableColumns: true,
+                    renderHorizontal: "virtual",
+                    layout: "fitColumns",
+                    columns: col,
+                    rowFormatter: function(row, e) {
+    //create and style holder elements
+    var holderEl = document.createElement("div");
+    var tableEl = document.createElement("div");
+
+    const id = row.getData().id;
+
+    holderEl.style.boxSizing = "border-box";
+    holderEl.style.padding = "10px 10px 10px 10px";
+    holderEl.style.borderTop = "1px solid #333";
+    holderEl.style.borderBotom = "1px solid #333";
+    holderEl.style.background = "#ddd";
+    holderEl.setAttribute('class', "subTable" + id + "");
+
+
+    tableEl.style.border = "1px solid #333";
+    tableEl.setAttribute('class', "subTable" + id + "");
+
+    holderEl.appendChild(tableEl);
+
+    row.getElement().appendChild(holderEl);
+ if ( ! row.getData().interventions === null && row.getData().interventions.length > 0) {
+     var subTable = new Tabulator(tableEl, {
+                            layout: "",
+                            rowHeight: 60,
+                            height:100,
+                            data: row.getData().interventions,
+                            columns:[
+                                {title:"Arm group lablels", field:"arm_group_label", formatter: "textarea"},
+                                {title:"Types", field:"types", formatter: "textarea"},
+                                {title:"Other names", field:"other_names", formatter: "textarea"},
+                                {title:"Name", field:"name", formatter: "textarea"},
+                                {title:"Description", field:"description", formatter: "textarea",height: 50},
+                            ]
+                        });
+
+                        row.getElement().appendChild(holderEl);
+                    }},
+                    //autoColumns:true,
+                    height: "80vh",
+                    dataTreeChildIndent:0,
+                    dataTreeStartExpanded: false,
+                    dataTree: true,
+                });
+            } catch (err) {
+                console.error("Error parsing JSON data:", err);
+            }
+        } else if (this.readyState === 4 && this.status !== 200) {
+            console.error("Error retrieving data. Status code:", Http.status);
         }
-      } else {
-        console.error("Error retrieving data. Status code:", Http.status);
-      }
-    }
-  }
-  }
-  make_all();
-    </script>
+    };
+}
+
+// Appelle la fonction make_all
+make_all();
+
+
+  </script>
 {% endblock %}
