@@ -15,12 +15,12 @@
     <button id="download-csv">Download CSV</button>
     <button id="download-json">Download JSON</button>
     <button id="download-xlsx">Download XLSX</button>
-    <button id="download-pdf">Download PDF</button>
     <button id="download-html">Download HTML</button>
 </div>
 <div>
   <button id="reload" onclick="make_all()">Reload</button>
 </div>
+
     <div id="example-table"></div>
 
     <!-- <script src="{% static '/js/index.js' %}"></script> -->
@@ -63,7 +63,7 @@ function onclick_render(cell, formatterParams, onRendered) {
 }
 
 
-    function make_all() {
+  async function make_all() {
     let num_page = {{ page }};
     let limit = {{ limit }};
     let url = "{% url 'get_data' page limit  %}";
@@ -81,14 +81,19 @@ function onclick_render(cell, formatterParams, onRendered) {
                     movableColumns: true,
                     renderHorizontal: "virtual",
                     layout: "fitColumns",
+                    pagination: "local",
+                    paginationSize: 25,
+                    paginationSizeSelector:[10, 25, 50, 100],
                     columns: col,
                     rowFormatter: function(row, e) {
+                      if (num_page > 2){
+                        return;
+                      }
     //create and style holder elements
     var holderEl = document.createElement("div");
     var tableEl = document.createElement("div");
 
-    const id = row.getData().id;
-
+    const id = row.getData()._id;
     holderEl.style.boxSizing = "border-box";
     holderEl.style.padding = "10px 10px 10px 10px";
     holderEl.style.borderTop = "1px solid #333";
@@ -101,11 +106,14 @@ function onclick_render(cell, formatterParams, onRendered) {
     tableEl.setAttribute('class', "subTable" + id + "");
 
     holderEl.appendChild(tableEl);
+    holderEl.classList.add("hidden");
+    tableEl.classList.add("hidden");
 
     row.getElement().appendChild(holderEl);
- if ( ! row.getData().interventions === null && row.getData().interventions.length > 0) {
+    tableEl.setAttribute('class', "subTable" + id + "");
+ if ( ! (row.getData().interventions === null) && row.getData().interventions.length > 0) {
      var subTable = new Tabulator(tableEl, {
-                            layout: "",
+                            layout: "fitData",
                             rowHeight: 60,
                             height:100,
                             data: row.getData().interventions,
@@ -114,18 +122,40 @@ function onclick_render(cell, formatterParams, onRendered) {
                                 {title:"Types", field:"types", formatter: "textarea"},
                                 {title:"Other names", field:"other_names", formatter: "textarea"},
                                 {title:"Name", field:"name", formatter: "textarea"},
-                                {title:"Description", field:"description", formatter: "textarea",height: 50},
-                            ]
+                                {title:"Description", field:"description", formatter: "textarea", widthGrow: 2},
+                            ],
                         });
 
                         row.getElement().appendChild(holderEl);
                     }},
                     //autoColumns:true,
                     height: "80vh",
-                    dataTreeChildIndent:0,
+                    rowHeight: 60,
                     dataTreeStartExpanded: false,
+                    childIndent: 0,
                     dataTree: true,
                 });
+
+
+          document.getElementById("download-csv").addEventListener("click", function(){
+    table.download("csv", "data.csv", "visible");
+});
+
+//trigger download of data.json file
+document.getElementById("download-json").addEventListener("click", function(){
+    table.download("json", "data.json", "visible");
+});
+
+//trigger download of data.xlsx file
+document.getElementById("download-xlsx").addEventListener("click", function(){
+    table.download("xlsx", "data.xlsx", {sheetName:"My Data"}, "visible");
+});
+
+//trigger download of data.html file
+document.getElementById("download-html").addEventListener("click", function(){
+    table.download("html", "data.html", {style:true});
+});
+
             } catch (err) {
                 console.error("Error parsing JSON data:", err);
             }
@@ -134,9 +164,11 @@ function onclick_render(cell, formatterParams, onRendered) {
         }
     };
 }
+make_all();
+
 
 // Appelle la fonction make_all
-make_all();
+
 
 
   </script>

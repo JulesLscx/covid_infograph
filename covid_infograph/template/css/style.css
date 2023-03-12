@@ -40,6 +40,14 @@ Make sticky nav template with a in a nav
     color: #ffff;
 }
 
+.hidden {
+    display: none;
+}
+
+.active {
+    display: block;
+}
+
 .current {
     color: #333;
 }
