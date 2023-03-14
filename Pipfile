@@ -9,6 +9,7 @@ pymongo = "*"
 pandas = "*"
 openpyxl = "*"
 requests = "*"
+plotly = "==5.13.1"
 
 [dev-packages]
 
