@@ -69,6 +69,7 @@ function onclick_render(cell, formatterParams, onRendered) {
     let url = "{% url 'get_data' page limit  %}";
     const Http = new XMLHttpRequest();
     Http.open("GET", url);
+    const data = fetch(url);
     Http.send();
     Http.onreadystatechange = function() {
         if (this.readyState === 4 && this.status === 200) {
@@ -131,6 +132,8 @@ function onclick_render(cell, formatterParams, onRendered) {
                     //autoColumns:true,
                     height: "80vh",
                     rowHeight: 60,
+                    downloadRowRange:"selected",
+                    resizableRows:true,
                     dataTreeStartExpanded: false,
                     childIndent: 0,
                     dataTree: true,
@@ -138,17 +141,17 @@ function onclick_render(cell, formatterParams, onRendered) {
 
 
           document.getElementById("download-csv").addEventListener("click", function(){
-    table.download("csv", "data.csv", "visible");
+    table.download("csv", "data.csv");
 });
 
 //trigger download of data.json file
 document.getElementById("download-json").addEventListener("click", function(){
-    table.download("json", "data.json", "visible");
+    table.download("json", "data.json");
 });
 
 //trigger download of data.xlsx file
 document.getElementById("download-xlsx").addEventListener("click", function(){
-    table.download("xlsx", "data.xlsx", {sheetName:"My Data"}, "visible");
+    table.download("xlsx", "data.xlsx", {sheetName:"My Data"});
 });
 
 //trigger download of data.html file

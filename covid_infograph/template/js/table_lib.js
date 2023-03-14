@@ -5,6 +5,85 @@ var hideIcon = function (cell, formatterParams, onRendered) { //plain text value
         return "0 ❌";
     }
 };
+//custom max min header filter
+var minMaxFilterEditor = function (cell, onRendered, success, cancel, editorParams) {
+
+    var end;
+
+    var container = document.createElement("span");
+
+    //create and style inputs
+    var start = document.createElement("input");
+    start.setAttribute("type", "number");
+    start.setAttribute("placeholder", "Min");
+    start.setAttribute("min", 0);
+    start.setAttribute("max", 100);
+    start.style.padding = "4px";
+    start.style.width = "50%";
+    start.style.boxSizing = "border-box";
+
+    start.value = cell.getValue();
+
+    function buildValues() {
+        success({
+            start: start.value,
+            end: end.value,
+        });
+    }
+
+    function keypress(e) {
+        if (e.keyCode == 13) {
+            buildValues();
+        }
+
+        if (e.keyCode == 27) {
+            cancel();
+        }
+    }
+
+    end = start.cloneNode();
+    end.setAttribute("placeholder", "Max");
+
+    start.addEventListener("change", buildValues);
+    start.addEventListener("blur", buildValues);
+    start.addEventListener("keydown", keypress);
+
+    end.addEventListener("change", buildValues);
+    end.addEventListener("blur", buildValues);
+    end.addEventListener("keydown", keypress);
+
+
+    container.appendChild(start);
+    container.appendChild(end);
+
+    return container;
+}
+
+//custom max min filter function
+function minMaxFilterFunction(headerValue, rowValue, rowData, filterParams) {
+    //headerValue - the value of the header filter element
+    //rowValue - the value of the column in this row
+    //rowData - the data for the row being filtered
+    //filterParams - params object passed to the headerFilterFuncParams property
+
+    if (rowValue) {
+        if (headerValue.start != "") {
+            if (headerValue.end != "") {
+                return rowValue >= headerValue.start && rowValue <= headerValue.end;
+            } else {
+                return rowValue >= headerValue.start;
+            }
+        } else {
+            if (headerValue.end != "") {
+                return rowValue <= headerValue.end;
+            }
+        }
+    }
+
+    return true; //must return a boolean, true if it passes the filter.
+}
+
+
 function get_column_dict(page) {
     if (page < 3) {
         return [
@@ -24,12 +103,16 @@ function get_column_dict(page) {
                 field: "_id",
                 visible: true,
                 sorter: "string",
+                headerFilter: "input",
+                headerFilterLiveFilter: false,
                 frozen: true
             },
             {
                 title: "Registry",
                 field: "registry",
                 visible: true,
+                headerFilter: "input",
+                headerFilterLiveFilter: false,
                 sorter: "string"
             },
             {
@@ -57,6 +140,7 @@ function get_column_dict(page) {
             {
                 title: "Gender",
                 field: "gender",
+                editor: "list", editorParams: { values: { "Male": "Male", "Female": "Female", "All": "All", "N/A": "N/A", clearable: true } }, headerFilter: true, headerFilterParams: { values: { "Male": "Male", "Female": "Female", "All": "All", "N/A": "N/A" }, clearable: true },
                 visible: true,
                 sorter: "string"
             },
@@ -67,7 +151,7 @@ function get_column_dict(page) {
                 sorter: "string"
             },
             {
-                formatter: hideIcon, align: "center", title: "Interventions", headerSort: false, cellClick: function (e, cell, formatterParams) {
+                formatter: hideIcon, sorter: "string", align: "center", title: "Interventions", cellClick: function (e, cell, formatterParams) {
                     const id = cell.getRow().getData()._id;
                     if (document.querySelector(".subTable" + id + "").style.display == "block") {
                         document.querySelector(".subTable" + id + "").style.display = "none";
@@ -94,7 +178,7 @@ function get_column_dict(page) {
                 field: "abstract",
                 visible: true,
                 sorter: "string",
-                maxHeight: 100,
+                formatter: "html"
             },
             {
                 title: "Phase",
@@ -120,6 +204,8 @@ function get_column_dict(page) {
                 title: "Id",
                 field: "_id",
                 visible: true,
+                headerFilter: "input",
+                headerFilterLiveFilter: false,
                 sorter: "string",
                 frozen: true
             },
@@ -127,7 +213,8 @@ function get_column_dict(page) {
                 title: "Year",
                 field: "year",
                 visible: true,
-                sorter: "number"
+                sorter: "number",
+                headerFilter: minMaxFilterEditor, headerFilterFunc: minMaxFilterFunction, headerFilterLiveFilter: false
             },
             {
                 title: "Date Inserted",
@@ -159,6 +246,8 @@ function get_column_dict(page) {
                 title: "pmid",
                 field: "pmid",
                 visible: true,
+                headerFilter: "input",
+                headerFilterLiveFilter: false,
                 sorter: "string"
             },
             {

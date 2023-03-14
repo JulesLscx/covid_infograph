@@ -1,13 +1,10 @@
 # ' -*- coding: utf-8 -*-
 import json
-from .variables import Keywords
+from variables import Keywords
 import pymongo as pm
 from openpyxl import load_workbook, Workbook
 import os
-from urllib.parse import quote_plus
-from .connection import SingletonMongoConnection as smc
-import pandas as pd
-from io import StringIO
+from connection import SingletonMongoConnection as smc
 
 
 # file = pd.read_excel(
@@ -37,7 +34,8 @@ def str_to_dict(*, string, last__id):
         dic = json.loads(string)
     except:
         if last__id:
-            print(last__id)
+            dic = {'id': last__id, 'issue': 'unable to load interventions column'}
+            insert_one_dic_in_mongo(dic=dic, collection='errors')
         dic = {}
     return dic
 
@@ -88,6 +86,14 @@ def create_dic_by_sheet(*, sheet_object):
                         string=cell.value, last__id=dic.get('_id'))
                 else:
                     dic[column_names[i]] = None
+            elif column_names[i] == 'concepts' or column_names[i] == 'meshTerms' or column_names[i] == 'openAccess':
+                if cell.value is not None:
+                    datas = []
+                    for data in cell.value.split('•'):
+                        datas.append(data.strip())
+                    dic[column_names[i]] = datas
+                else:
+                    dic[column_names[i]] = None
             else:
                 dic[column_names[i]] = cell.value
         result.append(dic)
@@ -115,7 +121,7 @@ def insert_dic_in_mongo(*, dic_list, collection):
 
 def init_collections():
     collections = [Keywords.T_CLINICALTRIALS_OBS.value, Keywords.T_CLINICALTRIALS_RAND.value,
-                   Keywords.T_PUBLICATION_OBS.value, Keywords.T_PUBLICATION_RAND.value]
+                   Keywords.T_PUBLICATION_OBS.value, Keywords.T_PUBLICATION_RAND.value, 'errors']
     for collection in collections:
         smc.get_db().drop_collection(collection)
         smc.get_db().create_collection(collection)
@@ -132,7 +138,7 @@ def load_excel_file():
 
     # Copilot ouvre le fichier en utf-8
     try:
-        workbook = load_workbook(filename=file_path, read_only=True)
+        workbook = load_workbook(filename=file_path)
         workbook.encoding = 'utf-8'
     except FileNotFoundError:
         print('Could not find the file')

@@ -33,17 +33,37 @@ def display_data(request, page, limit=100):
         return HttpResponse("Page not found")
     if page == 1:
         titre = Keywords.WS_CLINICALTRIALS_OBS.value
+        combos = {}
+        combos['registery'] = smc.get_db(
+        )[Keywords.T_CLINICALTRIALS_OBS.value].distinct('registery')
+        combos['phase'] = smc.get_db(
+        )[Keywords.T_CLINICALTRIALS_OBS.value].distinct('phase')
     elif page == 2:
         titre = Keywords.WS_CLINICALTRIALS_RAND.value
+        combos = {}
+        combos['registery'] = smc.get_db(
+        )[Keywords.T_CLINICALTRIALS_RAND.value].distinct('registery')
+        combos['phase'] = smc.get_db(
+        )[Keywords.T_CLINICALTRIALS_RAND.value].distinct('phase')
     elif page == 3:
         titre = Keywords.WS_PUBLICATION_OBS.value
+        combos = {}
+        combos['publisher'] = smc.get_db(
+        )[Keywords.T_PUBLICATION_OBS.value].distinct('publisher')
+        combos['venue'] = smc.get_db(
+        )[Keywords.T_PUBLICATION_OBS.value].distinct('venue')
+        combos['concepts'] = smc.get_db(
+        )[Keywords.T_PUBLICATION_OBS.value].aggregate([{'$unwind': '$concepts'}, {'$group': {'_id': '$concepts'}}])
     elif page == 4:
         titre = Keywords.WS_PUBLICATION_RAND.value
+    for key in combos:
+        combos[key] = dumps(combos[key])
     context = {
         'page': page,
         'limit': limit,
         'date': datetime.datetime.now(),
-        'titre': titre
+        'titre': titre,
+        'combos': combos
     }
     return HttpResponse(render(request, 'index.html', context))
 
