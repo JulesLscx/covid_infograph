@@ -27,4 +27,5 @@ urlpatterns = [
          views.display_data, name='display_data_limit'),
     path('api/<int:page>', views.display_data_filter, name='display_data_filter'),
     path('graph/<int:page>', views.display_graph, name='display_graph'),
+    path('graph/', views.all_date_graph, name='all_date_graph')
 ]

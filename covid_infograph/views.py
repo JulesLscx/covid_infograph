@@ -7,6 +7,8 @@ from .files.connection import SingletonMongoConnection as smc
 from django.shortcuts import render
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
+from plotly import express as px
+import pandas as pd
 
 
 def find_all(request, page, limit=100):
@@ -114,3 +116,68 @@ def filter_builder(filters):
 def accueil(request):
     template = loader.get_template('accueil.html')
     return HttpResponse(template.render(None, request))
+
+
+def all_date_graph(request):
+    collections = [Keywords.T_CLINICALTRIALS_OBS.value,
+                   Keywords.T_CLINICALTRIALS_RAND.value,
+                   Keywords.T_PUBLICATION_OBS.value,
+                   Keywords.T_PUBLICATION_RAND.value]
+    dict_df = {"date": [], "count": [], "collection": []}
+    for i, collection in enumerate(collections):
+        if i < 2:
+            cursor = smc.get_db()[collection].aggregate(
+                [{'$group': {'_id': '$date', 'count': {'$sum': 1}}}, {'$sort': {'_id': 1}}])
+        else:
+            cursor = smc.get_db()[collection].aggregate(
+                [{'$group': {'_id': '$datePublished', 'count': {'$sum': 1}}}, {'$sort': {'_id': 1}}])
+        list_cursor = list(cursor)
+        for item in list_cursor:
+            dict_df["date"].append(item["_id"])
+            dict_df["count"].append(item["count"])
+            dict_df["collection"].append(collection)
+    df = pd.DataFrame(dict_df)
+    print(df.head())
+    chart = px.bar(
+        df,
+        x='date',
+        y='count',
+        color='collection',
+        title='Nombre de données par date de publication'
+    )
+    chart.update_layout(
+        xaxis=dict(
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1,
+                         label="1m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=6,
+                         label="6m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=1,
+                         label="YTD",
+                         step="year",
+                         stepmode="todate"),
+                    dict(count=1,
+                         label="1y",
+                         step="year",
+                         stepmode="backward"),
+                    dict(step="all")
+                ])
+            ),
+            rangeslider=dict(
+                visible=True
+            ),
+            type="date"
+        )
+    )
+    chart = chart.to_html(
+        full_html=False,
+        default_height=600, default_width=800, include_plotlyjs='cdn')
+    context = {
+        'chart': chart
+    }
+    return HttpResponse(render(request, 'test_chat.html', context))
