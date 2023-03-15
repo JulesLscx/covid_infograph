@@ -50,22 +50,26 @@ def display_data(request, page, limit=100):
     elif page == 3:
         titre = Keywords.WS_PUBLICATION_OBS.value
         combos = {}
-        combos['publisher'] = smc.get_db(
+        tmp = smc.get_db(
         )[Keywords.T_PUBLICATION_OBS.value].distinct('publisher')
-        combos['venue'] = smc.get_db(
+        dic = {}
+        for item in tmp:
+            dic[item] = item
+        combos['publisher'] = dic
+        dic = {}
+        tmp = smc.get_db(
         )[Keywords.T_PUBLICATION_OBS.value].distinct('venue')
-        combos['concepts'] = smc.get_db(
-        )[Keywords.T_PUBLICATION_OBS.value].aggregate([{'$unwind': '$concepts'}, {'$group': {'_id': '$concepts'}}])
+        for item in tmp:
+            dic[item] = item
+        combos['venue'] = dic
     elif page == 4:
         titre = Keywords.WS_PUBLICATION_RAND.value
-    for key in combos:
-        combos[key] = dumps(combos[key])
     context = {
         'page': page,
         'limit': limit,
         'date': datetime.datetime.now(),
         'titre': titre,
-        'combos': combos
+        'combo': dumps(combos)
     }
     return HttpResponse(render(request, 'index.html', context))
 
