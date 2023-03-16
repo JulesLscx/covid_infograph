@@ -106,6 +106,15 @@ def create_dic_by_sheet(*, sheet_object):
                     dic[column_names[i]] = tmp.capitalize()
                 else:
                     dic[column_names[i]] = 'N/A'
+            elif column_names[i] == 'gender':
+                if cell.value is None:
+                    dic[column_names[i]] = 'N/A'
+                elif cell.value.upper() == 'N/A':
+                    dic[column_names[i]] = 'N/A'
+                elif cell.value.capitalize() not in ('Male', 'Female', 'All'):
+                    dic[column_names[i]] = 'N/A'
+                else:
+                    dic[column_names[i]] = cell.value.capitalize()
             else:
                 dic[column_names[i]] = cell.value
         result.append(dic)
