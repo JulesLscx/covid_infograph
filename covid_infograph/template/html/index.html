@@ -64,8 +64,9 @@ function onclick_render(cell, formatterParams, onRendered) {
 
 
   async function make_all() {
-    let num_page = {{ page }};
-    let limit = {{ limit }};
+    const num_page = {{ page }};
+    var limit = {{ limit }};
+    var combo = JSON.parse("{{ combo|escapejs }}");
     let url = "{% url 'get_data' page limit  %}";
     const Http = new XMLHttpRequest();
     Http.open("GET", url);
@@ -76,7 +77,7 @@ function onclick_render(cell, formatterParams, onRendered) {
             try {
                 const tabledata = JSON.parse(Http.responseText.replace(/\n/g, ""));
                 console.log(tabledata);
-                let col = get_column_dict(num_page);
+                let col = get_column_dict(num_page, combo);
                 var table = new Tabulator("#example-table", {
                     data: tabledata, //assign data to table
                     movableColumns: true,

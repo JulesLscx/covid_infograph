@@ -84,7 +84,8 @@ function minMaxFilterFunction(headerValue, rowValue, rowData, filterParams) {
 }
 
 
-function get_column_dict(page) {
+function get_column_dict(page, combo) {
+    console.log(combo);
     if (page < 3) {
         return [
             //First column is a selector
@@ -214,7 +215,7 @@ function get_column_dict(page) {
                 field: "year",
                 visible: true,
                 sorter: "number",
-                headerFilter: minMaxFilterEditor, headerFilterFunc: minMaxFilterFunction, headerFilterLiveFilter: false
+                headerFilter: minMaxFilterEditor, headerFilterFunc: minMaxFilterFunction, headerFilterLiveFilter: true
             },
             {
                 title: "Date Inserted",
@@ -247,7 +248,7 @@ function get_column_dict(page) {
                 field: "pmid",
                 visible: true,
                 headerFilter: "input",
-                headerFilterLiveFilter: false,
+                headerFilterLiveFilter: true,
                 sorter: "string"
             },
             {
@@ -263,23 +264,35 @@ function get_column_dict(page) {
                 title: "Times Cited",
                 field: "timesCited",
                 visible: true,
-                sorter: "number"
+                sorter: "number",
+                headerFilter: minMaxFilterEditor, headerFilterFunc: minMaxFilterFunction, headerFilterLiveFilter: false
+
             },
             {
                 title: "Altmetric Score",
                 field: "altmetric",
                 visible: true,
-                sorter: "number"
+                sorter: "number",
+                headerFilter: minMaxFilterEditor, headerFilterFunc: minMaxFilterFunction, headerFilterLiveFilter: false
+
             },
             {
                 title: "Venue",
                 field: "venue",
+                headerFilter: true, headerFilterParams: { values: combo.venue, clearable: true, multiselect: true },
+                headerFilter: 'select',
+                headerFilterFunc: "in",
+                editor: "list", editorParams: { values: combo.venue, clearable: true },
                 visible: true,
-                sorter: "string"
+                sorter: "string",
             },
             {
                 title: "Publisher",
                 field: "publisher",
+                headerFilter: true, headerFilterParams: { values: combo.publisher, clearable: true, multiselect: true },
+                headerFilter: 'select',
+                headerFilterFunc: "in",
+                editor: "list", editorParams: { values: combo.publisher, clearable: true },
                 visible: true,
                 sorter: "string"
             },
@@ -301,6 +314,7 @@ function get_column_dict(page) {
                 title: "Concepts",
                 field: "concepts",
                 visible: true,
+                headerFilter: "input",
                 sorter: "string",
                 formatter: "textarea",
                 maxInitialWidth: 400

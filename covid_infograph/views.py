@@ -50,22 +50,26 @@ def display_data(request, page, limit=100):
     elif page == 3:
         titre = Keywords.WS_PUBLICATION_OBS.value
         combos = {}
-        combos['publisher'] = smc.get_db(
+        tmp = smc.get_db(
         )[Keywords.T_PUBLICATION_OBS.value].distinct('publisher')
-        combos['venue'] = smc.get_db(
+        dic = {}
+        for item in tmp:
+            dic[item] = item
+        combos['publisher'] = dic
+        dic = {}
+        tmp = smc.get_db(
         )[Keywords.T_PUBLICATION_OBS.value].distinct('venue')
-        combos['concepts'] = smc.get_db(
-        )[Keywords.T_PUBLICATION_OBS.value].aggregate([{'$unwind': '$concepts'}, {'$group': {'_id': '$concepts'}}])
+        for item in tmp:
+            dic[item] = item
+        combos['venue'] = dic
     elif page == 4:
         titre = Keywords.WS_PUBLICATION_RAND.value
-    for key in combos:
-        combos[key] = dumps(combos[key])
     context = {
         'page': page,
         'limit': limit,
         'date': datetime.datetime.now(),
         'titre': titre,
-        'combos': combos
+        'combo': dumps(combos)
     }
     return HttpResponse(render(request, 'index.html', context))
 
@@ -182,34 +186,35 @@ def all_date_graph(request):
     }
     return HttpResponse(render(request, 'test_chat.html', context))
 
+
 def phase_graph(request):
     collections = [Keywords.T_CLINICALTRIALS_OBS.value,
-                   Keywords.T_CLINICALTRIALS_RAND.value,
-                   Keywords.T_PUBLICATION_OBS.value,
-                   Keywords.T_PUBLICATION_RAND.value]
+                   Keywords.T_CLINICALTRIALS_RAND.value]
     dict_df = {"phase": [], "count": [], "collection": []}
     for i, collection in enumerate(collections):
         cursor = smc.get_db()[collection].aggregate(
-            [{'$group': { '_id': "$phase",'count': { '$sum': 1 }}}])
+            [{'$group': {'_id': "$phase", 'count': {'$sum': 1}}}])
         list_cursor = list(cursor)
         for item in list_cursor:
             dict_df["phase"].append(item["_id"])
             dict_df["count"].append(item["count"])
             dict_df["collection"].append(collection)
     df = pd.DataFrame(dict_df)
+    df.sort_values(by=["phase", "collection"], inplace=True)
     print(df.head())
     phasegraph = px.bar(
         df,
         x="phase",
         y="count",
         color="collection",
-        title="Nombre de données par phase d'étude")
-    
+        title="Nombre de données par phase d'étude"
+    )
+
     phasegraph.update_layout(
         xaxis_title="Phase d'étude",
         yaxis_title="Nombre de données"
     )
-    
+
     phasegraph = phasegraph.to_html(
         full_html=False,
         default_height=600, default_width=800, include_plotlyjs='cdn')
