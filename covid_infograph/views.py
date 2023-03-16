@@ -186,34 +186,35 @@ def all_date_graph(request):
     }
     return HttpResponse(render(request, 'test_chat.html', context))
 
+
 def phase_graph(request):
     collections = [Keywords.T_CLINICALTRIALS_OBS.value,
-                   Keywords.T_CLINICALTRIALS_RAND.value,
-                   Keywords.T_PUBLICATION_OBS.value,
-                   Keywords.T_PUBLICATION_RAND.value]
+                   Keywords.T_CLINICALTRIALS_RAND.value]
     dict_df = {"phase": [], "count": [], "collection": []}
     for i, collection in enumerate(collections):
         cursor = smc.get_db()[collection].aggregate(
-            [{'$group': { '_id': "$phase",'count': { '$sum': 1 }}}])
+            [{'$group': {'_id': "$phase", 'count': {'$sum': 1}}}])
         list_cursor = list(cursor)
         for item in list_cursor:
             dict_df["phase"].append(item["_id"])
             dict_df["count"].append(item["count"])
             dict_df["collection"].append(collection)
     df = pd.DataFrame(dict_df)
+    df.sort_values(by=["phase", "collection"], inplace=True)
     print(df.head())
     phasegraph = px.bar(
         df,
         x="phase",
         y="count",
         color="collection",
-        title="Nombre de données par phase d'étude")
-    
+        title="Nombre de données par phase d'étude"
+    )
+
     phasegraph.update_layout(
         xaxis_title="Phase d'étude",
         yaxis_title="Nombre de données"
     )
-    
+
     phasegraph = phasegraph.to_html(
         full_html=False,
         default_height=600, default_width=800, include_plotlyjs='cdn')

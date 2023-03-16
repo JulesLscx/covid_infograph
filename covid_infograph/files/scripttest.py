@@ -94,6 +94,18 @@ def create_dic_by_sheet(*, sheet_object):
                     dic[column_names[i]] = datas
                 else:
                     dic[column_names[i]] = None
+            elif column_names[i] == 'phase':
+                tmp = cell.value
+                if tmp is None:
+                    dic[column_names[i]] = 'N/A'
+                elif type(tmp) == int:
+                    dic[column_names[i]] = 'Phase ' + str(tmp)
+                elif tmp.upper() == 'N/A':
+                    dic[column_names[i]] = 'N/A'
+                elif 'phase' in tmp.lower():
+                    dic[column_names[i]] = tmp.capitalize()
+                else:
+                    dic[column_names[i]] = 'N/A'
             else:
                 dic[column_names[i]] = cell.value
         result.append(dic)
