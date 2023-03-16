@@ -28,5 +28,7 @@ urlpatterns = [
     path('api/<int:page>', views.display_data_filter, name='display_data_filter'),
     path('graph/<int:page>', views.display_graph, name='display_graph'),
     path('graph/', views.all_date_graph, name='all_date_graph'),
-    path('phasegraph/', views.phase_graph, name='phase_graph')
+    path('phasegraph/', views.phase_graph, name='phase_graph'),
+    path('registrygraph/', views.registry_graph, name='registry_graph'),
+    path('classConcepts/', views.clasConcepts_graph, name='clasConcepts_graph')
 ]
