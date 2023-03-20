@@ -1,0 +1,6 @@
+use("covid_infograph");
+
+
+db.clinicalTrials_obsStudies.aggregate([
+  { $group: { _id: "$gender", count: { $sum: 1 } } }
+]);
