@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from plotly import express as px
+from plotly import graph_objects as go
 import pandas as pd
 
 
@@ -223,28 +224,61 @@ def phase_graph(request):
     }
     return HttpResponse(render(request, 'grah_theo.html', context))
 
+
+def group_by_gender_graph(request):
+    collections = [Keywords.T_CLINICALTRIALS_OBS.value,
+                   Keywords.T_CLINICALTRIALS_RAND.value
+                   ]
+    dict_df = {"gender": [], "count": [], "collection": []}
+    for i, collection in enumerate(collections):
+        cursor = smc.get_db()[collection].aggregate(
+            [{'$group': {'_id': "$gender", 'count': {'$sum': 1}}}])
+        list_cursor = list(cursor)
+        for item in list_cursor:
+            dict_df["gender"].append(item["_id"])
+            dict_df["count"].append(item["count"])
+            dict_df["collection"].append(collection)
+    df = pd.DataFrame(dict_df)
+    genregraph = px.bar(
+        df,
+        x="gender",
+        y="count",
+        color="collection",
+        title="Nombre d'essais par genre")
+
+    genregraph.update_layout(
+        xaxis_title="Genre",
+        yaxis_title="Nombre d'essais"
+    )
+    genregraph = genregraph.to_html(
+        full_html=False,
+        default_height=600, default_width=800, include_plotlyjs='cdn')
+    context = {
+        'genregraph': genregraph
+    }
+    return HttpResponse(render(request, 'graph_gender.html', context))
+
+
 def registry_graph(request):
     collections = [Keywords.T_CLINICALTRIALS_OBS.value,
                    Keywords.T_CLINICALTRIALS_RAND.value]
     dict_df = {"registry": [], "count": [], "collection": []}
     for i, collection in enumerate(collections):
         cursor = smc.get_db()[collection].aggregate(
-            [{'$group': { '_id': "$registry",'count': { '$sum': 1 }}}])
+            [{'$group': {'_id': "$registry", 'count': {'$sum': 1}}}])
         list_cursor = list(cursor)
         for item in list_cursor:
             dict_df["registry"].append(item["_id"])
             dict_df["count"].append(item["count"])
             dict_df["collection"].append(collection)
     df = pd.DataFrame(dict_df)
-    print(df.head())
-    #df = px.data.gapminder().query("year == 2007").query("continent == 'Europe'")
     df.loc[df['count'] < 2, 'registry'] = 'autres registres'
     registrygraph = px.pie(
         df,
         values="count",
         names="registry",
         title="Nombre de données par registre")
-    
+
     registrygraph = registrygraph.to_html(
         full_html=False,
         include_plotlyjs='cdn')
@@ -252,7 +286,82 @@ def registry_graph(request):
         'registrygraph': registrygraph
     }
     return HttpResponse(render(request, 'graph_registry.html', context))
-# collection tri date/unwind/group by / count /sort
+
+
+def Intervention_Drug_by_Date_graph(request):
+    collections = [Keywords.T_CLINICALTRIALS_OBS.value,
+                   Keywords.T_CLINICALTRIALS_RAND.value
+                   ]
+    dict_df = {"date": [], "count": [], "collection": []}
+    for i, collection in enumerate(collections):
+        cursor = smc.get_db()[collection].aggregate(
+            [{
+                "$match": {
+                    "interventions.type": "Drug"
+                }
+            },
+                {
+                "$group": {
+                    "_id": {"$dateToString": {"format": "%Y-%m", "date": "$date"}},
+                    "count": {"$sum": 1}
+                }
+            },
+                {
+                "$sort": {
+                    "_id": 1
+                }
+            }])
+        list_cursor = list(cursor)
+        for item in list_cursor:
+            dict_df["date"].append(item["_id"])
+            dict_df["count"].append(item['count'])
+            dict_df['collection'].append(collection)
+    df = pd.DataFrame(dict_df)
+    print(df.head())
+    chart = px.bar(
+        df,
+        x='date',
+        y='count',
+        color='collection',
+        title='Nombre d\intervention de type Drug par dates'
+    )
+    chart.update_layout(
+        xaxis=dict(
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1,
+                         label="1m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=6,
+                         label="6m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=1,
+                         label="YTD",
+                         step="year",
+                         stepmode="todate"),
+                    dict(count=1,
+                         label="1y",
+                         step="year",
+                         stepmode="backward"),
+                    dict(step="all")
+                ])
+            ),
+            rangeslider=dict(
+                visible=True
+            ),
+            type="date"
+        )
+    )
+    chart = chart.to_html(
+        full_html=False,
+        default_height=600, default_width=800, include_plotlyjs='cdn')
+    context = {
+        'interventionsgraph': chart
+    }
+    return HttpResponse(render(request, 'graph_interventions.html', context))
+
 
 def clasConcepts_graph(request):
     collections = [Keywords.T_PUBLICATION_OBS.value,
@@ -260,16 +369,17 @@ def clasConcepts_graph(request):
     dict_df = {"concepts": [], "count": [], "collection": []}
     for i, collection in enumerate(collections):
         cursor = smc.get_db()[collection].aggregate(
-            [{'$unwind': "$concepts" },{'$group': { '_id': "$concepts", 'count': { '$sum': 1 } } },{ '$sort': { '_id': -1 } }])
+            [{'$unwind': {'path': "$concepts",'preserveNullAndEmptyArrays': False }}, { "$group": { '_id': { 'date': { "$dateToString": {'format': '%Y-%m', 'date': "$datePublished" }}, 'concepts': "$concepts" }, 'count': { "$sum": 1 }}}, { "$sort": { 'date': 1, 'count': -1 }},{'$limit': 100 }], allowDiskUse=True)
         list_cursor = list(cursor)
         for item in list_cursor:
-            dict_df["concepts"].append(item["_id"])
+            dict_df["concepts"].append(item["_id"]['concepts'])
             dict_df["count"].append(item["count"])
             dict_df["collection"].append(collection)
     df = pd.DataFrame(dict_df)
+    classement = list(range(1, 101))
     print(df.head())
-    clasConceptsgraph = px.Figure(data=[px.Table(header=dict(values=['Concepts', 'Count']),
-                 cells=dict(values=[['concepts'], ['count']]))
+    clasConceptsgraph = go.Figure(data=[go.Table(header=dict(values=['Classement', 'Concepts', 'Nombre']),
+                 cells=dict(values=[classement, df['concepts'], df['count']]))
                      ])
     
     clasConceptsgraph = clasConceptsgraph.to_html(
