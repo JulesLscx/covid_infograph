@@ -30,5 +30,5 @@ urlpatterns = [
     path('graph/', views.all_date_graph, name='all_date_graph'),
     path('phasegraph/', views.phase_graph, name='phase_graph'),
     path('gendergraph/', views.group_by_gender_graph, name='group_by_gender_graph'),
-     path('interventionsgraph/', views.Intervention_Drug_by_Date_graph, name='Intervention_Drug_by_Date_graph')
+    path('interventionsgraph/', views.Intervention_Drug_by_Date_graph, name='Intervention_Drug_by_Date_graph')
 ]

@@ -186,34 +186,35 @@ def all_date_graph(request):
     }
     return HttpResponse(render(request, 'test_chat.html', context))
 
+
 def phase_graph(request):
     collections = [Keywords.T_CLINICALTRIALS_OBS.value,
-                   Keywords.T_CLINICALTRIALS_RAND.value,
-                   Keywords.T_PUBLICATION_OBS.value,
-                   Keywords.T_PUBLICATION_RAND.value]
+                   Keywords.T_CLINICALTRIALS_RAND.value]
     dict_df = {"phase": [], "count": [], "collection": []}
     for i, collection in enumerate(collections):
         cursor = smc.get_db()[collection].aggregate(
-            [{'$group': { '_id': "$phase",'count': { '$sum': 1 }}}])
+            [{'$group': {'_id': "$phase", 'count': {'$sum': 1}}}])
         list_cursor = list(cursor)
         for item in list_cursor:
             dict_df["phase"].append(item["_id"])
             dict_df["count"].append(item["count"])
             dict_df["collection"].append(collection)
     df = pd.DataFrame(dict_df)
+    df.sort_values(by=["phase", "collection"], inplace=True)
     print(df.head())
     phasegraph = px.bar(
         df,
         x="phase",
         y="count",
         color="collection",
-        title="Nombre de données par phase d'étude")
-    
+        title="Nombre de données par phase d'étude"
+    )
+
     phasegraph.update_layout(
         xaxis_title="Phase d'étude",
         yaxis_title="Nombre de données"
     )
-    
+
     phasegraph = phasegraph.to_html(
         full_html=False,
         default_height=600, default_width=800, include_plotlyjs='cdn')
@@ -233,9 +234,6 @@ def group_by_gender_graph(request):
         list_cursor = list(cursor)
         for item in list_cursor:
             dict_df["gender"].append(item["_id"])
-            dict_df["count"].append(item["count"])
-            dict_df["collection"].append(collection)
-    df = pd.DataFrame(dict_df)
     print(df.head())
     genregraph = px.bar(
         df,
@@ -248,7 +246,6 @@ def group_by_gender_graph(request):
         xaxis_title="Genre",
         yaxis_title="Nombre d'essais"
     )
-
     genregraph = genregraph.to_html(
         full_html=False,
         default_height=600, default_width=800, include_plotlyjs='cdn')
@@ -257,6 +254,34 @@ def group_by_gender_graph(request):
     }
     return HttpResponse(render(request, 'graph_gender.html', context))
 
+def registry_graph(request):
+    collections = [Keywords.T_CLINICALTRIALS_OBS.value,
+                   Keywords.T_CLINICALTRIALS_RAND.value]
+    dict_df = {"registry": [], "count": [], "collection": []}
+    for i, collection in enumerate(collections):
+        cursor = smc.get_db()[collection].aggregate(
+            [{'$group': { '_id': "$registry",'count': { '$sum': 1 }}}])
+        list_cursor = list(cursor)
+        for item in list_cursor:
+            dict_df["registry"].append(item["_id"])
+            dict_df["count"].append(item["count"])
+            dict_df["collection"].append(collection)
+    df = pd.DataFrame(dict_df)
+    df.loc[df['count'] < 2, 'registry'] = 'autres registres'
+    registrygraph = px.pie(
+        df,
+        values="count",
+        names="registry",
+        title="Nombre de données par registre")
+    
+    registrygraph = registrygraph.to_html(
+        full_html=False,
+        include_plotlyjs='cdn')
+    context = {
+        'registrygraph': registrygraph
+    }
+    return HttpResponse(render(request, 'graph_registry.html', context))
+    
 def Intervention_Drug_by_Date_graph(request):
     collections = [Keywords.T_CLINICALTRIALS_OBS.value,
                     Keywords.T_CLINICALTRIALS_RAND.value
@@ -283,6 +308,68 @@ def Intervention_Drug_by_Date_graph(request):
         list_cursor = list(cursor)
         for item in list_cursor:
             dict_df["date"].append(item["_id"])
+            dict_df["count"].append(item['count'])
+            dict_df['collection'].append(collection)
+    df = pd.DataFrame(dict_df)
+    print(df.head())
+    chart = px.bar(
+        df,
+        x='date',
+        y='count',
+        color='collection',
+        title='Nombre d\intervention de type Drug par dates'
+    )
+    chart.update_layout(
+        xaxis=dict(
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1,
+                         label="1m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=6,
+                         label="6m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=1,
+                         label="YTD",
+                         step="year",
+                         stepmode="todate"),
+                    dict(count=1,
+                         label="1y",
+                         step="year",
+                         stepmode="backward"),
+                    dict(step="all")
+                ])
+            ),
+            rangeslider=dict(
+                visible=True
+            ),
+            type="date"
+        )
+    )
+    chart = chart.to_html(
+        full_html=False,
+        default_height=600, default_width=800, include_plotlyjs='cdn')
+    context = {
+        'interventionsgraph': chart
+    }
+    return HttpResponse(render(request, 'graph_interventions.html', context))
+        
+    
+    
+
+
+def clasConcepts_graph(request):
+    collections = [Keywords.T_PUBLICATION_OBS.value,
+                   Keywords.T_PUBLICATION_RAND.value]
+    dict_df = {"concepts": [], "count": [], "collection": []}
+    for i, collection in enumerate(collections):
+        cursor = smc.get_db()[collection].aggregate(
+            [{'$unwind': "$concepts" },{'$group': { '_id': "$concepts", 'count': { '$sum': 1 } } },{ '$sort': { '_id': -1 } }])
+        list_cursor = list(cursor)
+        for item in list_cursor:
+            dict_df["concepts"].append(item["_id"])
             dict_df["count"].append(item["count"])
             dict_df["collection"].append(collection)
     df = pd.DataFrame(dict_df)
@@ -335,3 +422,4 @@ def Intervention_Drug_by_Date_graph(request):
         'genregraph': genregraph
     }
     return HttpResponse(render(request, 'graph_gender.html', context))
+
