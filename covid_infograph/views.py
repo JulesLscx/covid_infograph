@@ -244,21 +244,11 @@ def group_by_gender_graph(request):
         x="gender",
         y="count",
         color="collection",
-        title="Nombre d'essais par genre")
-    genregraph = px.bar(
-        df,
-        x="date",
-        y="count",
-        color="collection",
         title="Nombre d'intervention de type Drug par date")
 
     genregraph.update_layout(
         xaxis_title="Date",
         yaxis_title="Nombre d'intervention de type Drug"
-    )
-    genregraph.update_layout(
-        xaxis_title="Genre",
-        yaxis_title="Nombre d'essais"
     )
     genregraph = genregraph.to_html(
         full_html=False,
