@@ -222,3 +222,60 @@ def phase_graph(request):
         'phasegraph': phasegraph
     }
     return HttpResponse(render(request, 'grah_theo.html', context))
+
+def registry_graph(request):
+    collections = [Keywords.T_CLINICALTRIALS_OBS.value,
+                   Keywords.T_CLINICALTRIALS_RAND.value]
+    dict_df = {"registry": [], "count": [], "collection": []}
+    for i, collection in enumerate(collections):
+        cursor = smc.get_db()[collection].aggregate(
+            [{'$group': { '_id': "$registry",'count': { '$sum': 1 }}}])
+        list_cursor = list(cursor)
+        for item in list_cursor:
+            dict_df["registry"].append(item["_id"])
+            dict_df["count"].append(item["count"])
+            dict_df["collection"].append(collection)
+    df = pd.DataFrame(dict_df)
+    print(df.head())
+    #df = px.data.gapminder().query("year == 2007").query("continent == 'Europe'")
+    df.loc[df['count'] < 2, 'registry'] = 'autres registres'
+    registrygraph = px.pie(
+        df,
+        values="count",
+        names="registry",
+        title="Nombre de données par registre")
+    
+    registrygraph = registrygraph.to_html(
+        full_html=False,
+        include_plotlyjs='cdn')
+    context = {
+        'registrygraph': registrygraph
+    }
+    return HttpResponse(render(request, 'graph_registry.html', context))
+# collection tri date/unwind/group by / count /sort
+
+def clasConcepts_graph(request):
+    collections = [Keywords.T_PUBLICATION_OBS.value,
+                   Keywords.T_PUBLICATION_RAND.value]
+    dict_df = {"concepts": [], "count": [], "collection": []}
+    for i, collection in enumerate(collections):
+        cursor = smc.get_db()[collection].aggregate(
+            [{'$unwind': "$concepts" },{'$group': { '_id': "$concepts", 'count': { '$sum': 1 } } },{ '$sort': { '_id': -1 } }])
+        list_cursor = list(cursor)
+        for item in list_cursor:
+            dict_df["concepts"].append(item["_id"])
+            dict_df["count"].append(item["count"])
+            dict_df["collection"].append(collection)
+    df = pd.DataFrame(dict_df)
+    print(df.head())
+    clasConceptsgraph = px.Figure(data=[px.Table(header=dict(values=['Concepts', 'Count']),
+                 cells=dict(values=[['concepts'], ['count']]))
+                     ])
+    
+    clasConceptsgraph = clasConceptsgraph.to_html(
+        full_html=False,
+        include_plotlyjs='cdn')
+    context = {
+        'clasConceptsgraph': clasConceptsgraph
+    }
+    return HttpResponse(render(request, 'clasConcepts_graph.html', context))
