@@ -221,3 +221,117 @@ def phase_graph(request):
         'phasegraph': phasegraph
     }
     return HttpResponse(render(request, 'grah_theo.html', context))
+
+def group_by_gender_graph(request):
+    collections = [Keywords.T_CLINICALTRIALS_OBS.value,
+                    Keywords.T_CLINICALTRIALS_RAND.value
+                   ]
+    dict_df = {"gender": [], "count": [], "collection": []}
+    for i, collection in enumerate(collections):
+        cursor = smc.get_db()[collection].aggregate(
+            [{'$group': { '_id': "$gender",'count': { '$sum': 1 }}}])
+        list_cursor = list(cursor)
+        for item in list_cursor:
+            dict_df["gender"].append(item["_id"])
+            dict_df["count"].append(item["count"])
+            dict_df["collection"].append(collection)
+    df = pd.DataFrame(dict_df)
+    print(df.head())
+    genregraph = px.bar(
+        df,
+        x="gender",
+        y="count",
+        color="collection",
+        title="Nombre d'essais par genre")
+
+    genregraph.update_layout(
+        xaxis_title="Genre",
+        yaxis_title="Nombre d'essais"
+    )
+
+    genregraph = genregraph.to_html(
+        full_html=False,
+        default_height=600, default_width=800, include_plotlyjs='cdn')
+    context = {
+        'genregraph': genregraph
+    }
+    return HttpResponse(render(request, 'graph_gender.html', context))
+
+def Intervention_Drug_by_Date_graph(request):
+    collections = [Keywords.T_CLINICALTRIALS_OBS.value,
+                    Keywords.T_CLINICALTRIALS_RAND.value
+                    ]
+    dict_df = {"date": [], "count": [], "collection": []}
+    for i, collection in enumerate(collections):
+        cursor = smc.get_db()[collection].aggregate(
+            [{
+    "$match": {
+      "interventions.type": "Drug"
+    }
+  },
+  {
+    "$group": {
+      "_id": { "$dateToString": { "format": "%Y-%m", "date": "$date" } },
+      "count": { "$sum": 1 }
+    }
+  },
+  {
+    "$sort": {
+      "_id": 1
+    }
+  }])
+        list_cursor = list(cursor)
+        for item in list_cursor:
+            dict_df["date"].append(item["_id"])
+            dict_df["count"].append(item["count"])
+            dict_df["collection"].append(collection)
+    df = pd.DataFrame(dict_df)
+    print(df.head())
+    genregraph = px.bar(
+        df,
+        x="date",
+        y="count",
+        color="collection",
+        title="Nombre d'intervention de type Drug par date")
+
+    genregraph.update_layout(
+        xaxis_title="Date",
+        yaxis_title="Nombre d'intervention de type Drug"
+    )
+    genregraph.update_layout(
+        xaxis=dict(
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1,
+                         label="1m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=6,
+                         label="6m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=1,
+                         label="YTD",
+                         step="year",
+                         stepmode="todate"),
+                    dict(count=1,
+                         label="1y",
+                         step="year",
+                         stepmode="backward"),
+                    dict(step="all")
+                ])
+            ),
+            rangeslider=dict(
+                visible=True
+            ),
+            type="date"
+        )
+    )
+
+    genregraph = genregraph.to_html(
+        full_html=False,
+        default_height=600, default_width=800, include_plotlyjs='cdn')
+    context = {
+        'genregraph': genregraph
+    }
+    return HttpResponse(render(request, 'graph_gender.html', context))
