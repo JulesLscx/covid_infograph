@@ -223,18 +223,21 @@ def phase_graph(request):
     }
     return HttpResponse(render(request, 'grah_theo.html', context))
 
+
 def group_by_gender_graph(request):
     collections = [Keywords.T_CLINICALTRIALS_OBS.value,
-                    Keywords.T_CLINICALTRIALS_RAND.value
+                   Keywords.T_CLINICALTRIALS_RAND.value
                    ]
     dict_df = {"gender": [], "count": [], "collection": []}
     for i, collection in enumerate(collections):
         cursor = smc.get_db()[collection].aggregate(
-            [{'$group': { '_id': "$gender",'count': { '$sum': 1 }}}])
+            [{'$group': {'_id': "$gender", 'count': {'$sum': 1}}}])
         list_cursor = list(cursor)
         for item in list_cursor:
             dict_df["gender"].append(item["_id"])
-    print(df.head())
+            dict_df["count"].append(item["count"])
+            dict_df["collection"].append(collection)
+    df = pd.DataFrame(dict_df)
     genregraph = px.bar(
         df,
         x="gender",
@@ -254,13 +257,14 @@ def group_by_gender_graph(request):
     }
     return HttpResponse(render(request, 'graph_gender.html', context))
 
+
 def registry_graph(request):
     collections = [Keywords.T_CLINICALTRIALS_OBS.value,
                    Keywords.T_CLINICALTRIALS_RAND.value]
     dict_df = {"registry": [], "count": [], "collection": []}
     for i, collection in enumerate(collections):
         cursor = smc.get_db()[collection].aggregate(
-            [{'$group': { '_id': "$registry",'count': { '$sum': 1 }}}])
+            [{'$group': {'_id': "$registry", 'count': {'$sum': 1}}}])
         list_cursor = list(cursor)
         for item in list_cursor:
             dict_df["registry"].append(item["_id"])
@@ -273,7 +277,7 @@ def registry_graph(request):
         values="count",
         names="registry",
         title="Nombre de données par registre")
-    
+
     registrygraph = registrygraph.to_html(
         full_html=False,
         include_plotlyjs='cdn')
@@ -281,30 +285,31 @@ def registry_graph(request):
         'registrygraph': registrygraph
     }
     return HttpResponse(render(request, 'graph_registry.html', context))
-    
+
+
 def Intervention_Drug_by_Date_graph(request):
     collections = [Keywords.T_CLINICALTRIALS_OBS.value,
-                    Keywords.T_CLINICALTRIALS_RAND.value
-                    ]
+                   Keywords.T_CLINICALTRIALS_RAND.value
+                   ]
     dict_df = {"date": [], "count": [], "collection": []}
     for i, collection in enumerate(collections):
         cursor = smc.get_db()[collection].aggregate(
             [{
-    "$match": {
-      "interventions.type": "Drug"
-    }
-  },
-  {
-    "$group": {
-      "_id": { "$dateToString": { "format": "%Y-%m", "date": "$date" } },
-      "count": { "$sum": 1 }
-    }
-  },
-  {
-    "$sort": {
-      "_id": 1
-    }
-  }])
+                "$match": {
+                    "interventions.type": "Drug"
+                }
+            },
+                {
+                "$group": {
+                    "_id": {"$dateToString": {"format": "%Y-%m", "date": "$date"}},
+                    "count": {"$sum": 1}
+                }
+            },
+                {
+                "$sort": {
+                    "_id": 1
+                }
+            }])
         list_cursor = list(cursor)
         for item in list_cursor:
             dict_df["date"].append(item["_id"])
@@ -355,9 +360,6 @@ def Intervention_Drug_by_Date_graph(request):
         'interventionsgraph': chart
     }
     return HttpResponse(render(request, 'graph_interventions.html', context))
-        
-    
-    
 
 
 def clasConcepts_graph(request):
@@ -366,7 +368,7 @@ def clasConcepts_graph(request):
     dict_df = {"concepts": [], "count": [], "collection": []}
     for i, collection in enumerate(collections):
         cursor = smc.get_db()[collection].aggregate(
-            [{'$unwind': "$concepts" },{'$group': { '_id': "$concepts", 'count': { '$sum': 1 } } },{ '$sort': { '_id': -1 } }])
+            [{'$unwind': "$concepts"}, {'$group': {'_id': "$concepts", 'count': {'$sum': 1}}}, {'$sort': {'_id': -1}}])
         list_cursor = list(cursor)
         for item in list_cursor:
             dict_df["concepts"].append(item["_id"])
@@ -422,4 +424,3 @@ def clasConcepts_graph(request):
         'genregraph': genregraph
     }
     return HttpResponse(render(request, 'graph_gender.html', context))
-
