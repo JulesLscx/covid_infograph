@@ -64,6 +64,19 @@ def display_data(request, page, limit=100):
         combos['venue'] = dic
     elif page == 4:
         titre = Keywords.WS_PUBLICATION_RAND.value
+        combos = {}
+        tmp = smc.get_db(
+        )[Keywords.T_PUBLICATION_RAND.value].distinct('publisher')
+        dic = {}
+        for item in tmp:
+            dic[item] = item
+        combos['publisher'] = dic
+        dic = {}
+        tmp = smc.get_db(
+        )[Keywords.T_PUBLICATION_RAND.value].distinct('venue')
+        for item in tmp:
+            dic[item] = item
+        combos['venue'] = dic
     context = {
         'page': page,
         'limit': limit,
