@@ -29,10 +29,5 @@
     {% else %}
     <a class="nav-item" href="{% url 'display_data' 4 %}">Publications random trials</a>
     {% endif %}
-    {% if graph == 1 %}
-    <a class="nav-item current" href="{% url 'display_graph' 1 %}">Graph 1</a>
-    {% else %}
-    <a class="nav-item" href="{% url 'display_graph' 1 %}">Graphiques</a>
-    {% endif %}
 
 </nav>

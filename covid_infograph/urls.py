@@ -25,8 +25,6 @@ urlpatterns = [
     path('display/<int:page>', views.display_data, name='display_data'),
     path('display/<int:page>/<int:limit>',
          views.display_data, name='display_data_limit'),
-    path('api/<int:page>', views.display_data_filter, name='display_data_filter'),
-    path('graph/<int:page>', views.display_graph, name='display_graph'),
     path('graph/', views.all_date_graph, name='all_date_graph'),
     path('phasegraph/', views.phase_graph, name='phase_graph'),
     path('gendergraph/', views.group_by_gender_graph,

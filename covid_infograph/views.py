@@ -88,52 +88,8 @@ def display_data(request, page, limit=100):
     return HttpResponse(render(request, 'index.html', context))
 
 
-@csrf_exempt
-def display_data_filter(request, page, limit=100):
-    if page == 1:
-        value = Keywords.T_CLINICALTRIALS_OBS.value
-    elif page == 2:
-        value = Keywords.T_CLINICALTRIALS_RAND.value
-    elif page == 3:
-        value = Keywords.T_PUBLICATION_OBS.value
-    elif page == 4:
-        value = Keywords.T_PUBLICATION_RAND.value
-    else:
-        return HttpResponse(
-            "Page not found, please check the url check the documentation")
-    if request.method != 'POST':
-        return HttpResponse("Error, shsould be a POST request")
-    data_dict = json.loads(request.body.decode('utf-8'))
-    filters = filter_builder(data_dict)
-    cursor = smc.get_db()[value].aggregate(filters)
-    return HttpResponse(dumps(list(cursor)))
-
-
-def display_graph(request, page, limit=100):
-    if page == 1:
-        value = Keywords.T_CLINICALTRIALS_OBS.value
-    elif page == 2:
-        value = Keywords.T_CLINICALTRIALS_RAND.value
-    elif page == 3:
-        value = Keywords.T_PUBLICATION_OBS.value
-    elif page == 4:
-        value = Keywords.T_PUBLICATION_RAND.value
-    else:
-        return HttpResponse(
-            "Page not found, please check the url check the documentation")
-    cursor = smc.get_db()[value].find({'date': 1})
-    list_cursor = list(cursor)
-    return HttpResponse(render(request, 'graph.html', {'dates': list_cursor, 'page': page}))
-
-
-def filter_builder(filters):
-    filters = []
-    return filters
-
-
 def accueil(request):
-    template = loader.get_template('accueil.html')
-    return HttpResponse(template.render(None, request))
+    return HttpResponse(render(request, 'dashboard.html', {}))
 
 
 def all_date_graph(request):
@@ -382,7 +338,7 @@ def clasConcepts_graph(request):
     dict_df = {"concepts": [], "count": [], "collection": []}
     for i, collection in enumerate(collections):
         cursor = smc.get_db()[collection].aggregate(
-            [{'$unwind': {'path': "$concepts",'preserveNullAndEmptyArrays': False }}, { "$group": { '_id': { 'date': { "$dateToString": {'format': '%Y-%m', 'date': "$datePublished" }}, 'concepts': "$concepts" }, 'count': { "$sum": 1 }}}, { "$sort": { 'date': 1, 'count': -1 }},{'$limit': 100 }], allowDiskUse=True)
+            [{'$unwind': {'path': "$concepts", 'preserveNullAndEmptyArrays': False}}, {"$group": {'_id': {'date': {"$dateToString": {'format': '%Y-%m', 'date': "$datePublished"}}, 'concepts': "$concepts"}, 'count': {"$sum": 1}}}, {"$sort": {'date': 1, 'count': -1}}, {'$limit': 100}], allowDiskUse=True)
         list_cursor = list(cursor)
         for item in list_cursor:
             dict_df["concepts"].append(item["_id"]['concepts'])
@@ -392,9 +348,9 @@ def clasConcepts_graph(request):
     classement = list(range(1, 101))
     print(df.head())
     clasConceptsgraph = go.Figure(data=[go.Table(header=dict(values=['Classement', 'Concepts', 'Nombre']),
-                 cells=dict(values=[classement, df['concepts'], df['count']]))
-                     ])
-    
+                                                 cells=dict(values=[classement, df['concepts'], df['count']]))
+                                        ])
+
     clasConceptsgraph = clasConceptsgraph.to_html(
         full_html=False,
         include_plotlyjs='cdn')
@@ -402,3 +358,8 @@ def clasConcepts_graph(request):
         'clasConceptsgraph': clasConceptsgraph
     }
     return HttpResponse(render(request, 'clasConcepts_graph.html', context))
+
+
+def search_api(request):
+    if request.method == 'GET':
+        return HttpResponse(request, )
