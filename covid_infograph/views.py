@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from plotly import express as px
 from plotly import graph_objects as go
 import pandas as pd
+from django import forms
 
 
 def find_all(request, page, limit=100):
@@ -361,5 +362,15 @@ def clasConcepts_graph(request):
 
 
 def search_api(request):
-    if request.method == 'GET':
-        return HttpResponse(request, )
+    from .forms import SearchForm
+    from .files.search_engine import searching
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            results = searching(form.cleaned_data['search'])
+    else:
+        form = SearchForm()
+
+    return render(request, 'search_page.html', {'form': form})

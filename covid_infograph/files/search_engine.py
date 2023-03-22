@@ -1,5 +1,5 @@
-from variables import Keywords
-from connection import SingletonMongoConnection as smc
+from .variables import Keywords
+from .connection import SingletonMongoConnection as smc
 
 
 def searching(*, text: str):
