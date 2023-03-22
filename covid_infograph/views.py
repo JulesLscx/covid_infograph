@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from plotly import express as px
+from plotly import graph_objects as go
 import pandas as pd
 
 
@@ -256,11 +257,11 @@ def group_by_gender_graph(request):
         x="gender",
         y="count",
         color="collection",
-        title="Nombre d'essais par genre")
+        title="Nombre d'intervention de type Drug par date")
 
     genregraph.update_layout(
-        xaxis_title="Genre",
-        yaxis_title="Nombre d'essais"
+        xaxis_title="Date",
+        yaxis_title="Nombre d'intervention de type Drug"
     )
     genregraph = genregraph.to_html(
         full_html=False,
@@ -381,59 +382,23 @@ def clasConcepts_graph(request):
     dict_df = {"concepts": [], "count": [], "collection": []}
     for i, collection in enumerate(collections):
         cursor = smc.get_db()[collection].aggregate(
-            [{'$unwind': "$concepts"}, {'$group': {'_id': "$concepts", 'count': {'$sum': 1}}}, {'$sort': {'_id': -1}}])
+            [{'$unwind': {'path': "$concepts",'preserveNullAndEmptyArrays': False }}, { "$group": { '_id': { 'date': { "$dateToString": {'format': '%Y-%m', 'date': "$datePublished" }}, 'concepts': "$concepts" }, 'count': { "$sum": 1 }}}, { "$sort": { 'date': 1, 'count': -1 }},{'$limit': 100 }], allowDiskUse=True)
         list_cursor = list(cursor)
         for item in list_cursor:
-            dict_df["concepts"].append(item["_id"])
+            dict_df["concepts"].append(item["_id"]['concepts'])
             dict_df["count"].append(item["count"])
             dict_df["collection"].append(collection)
     df = pd.DataFrame(dict_df)
+    classement = list(range(1, 101))
     print(df.head())
-    genregraph = px.bar(
-        df,
-        x="date",
-        y="count",
-        color="collection",
-        title="Nombre d'intervention de type Drug par date")
-
-    genregraph.update_layout(
-        xaxis_title="Date",
-        yaxis_title="Nombre d'intervention de type Drug"
-    )
-    genregraph.update_layout(
-        xaxis=dict(
-            rangeselector=dict(
-                buttons=list([
-                    dict(count=1,
-                         label="1m",
-                         step="month",
-                         stepmode="backward"),
-                    dict(count=6,
-                         label="6m",
-                         step="month",
-                         stepmode="backward"),
-                    dict(count=1,
-                         label="YTD",
-                         step="year",
-                         stepmode="todate"),
-                    dict(count=1,
-                         label="1y",
-                         step="year",
-                         stepmode="backward"),
-                    dict(step="all")
-                ])
-            ),
-            rangeslider=dict(
-                visible=True
-            ),
-            type="date"
-        )
-    )
-
-    genregraph = genregraph.to_html(
+    clasConceptsgraph = go.Figure(data=[go.Table(header=dict(values=['Classement', 'Concepts', 'Nombre']),
+                 cells=dict(values=[classement, df['concepts'], df['count']]))
+                     ])
+    
+    clasConceptsgraph = clasConceptsgraph.to_html(
         full_html=False,
-        default_height=600, default_width=800, include_plotlyjs='cdn')
+        include_plotlyjs='cdn')
     context = {
-        'genregraph': genregraph
+        'clasConceptsgraph': clasConceptsgraph
     }
-    return HttpResponse(render(request, 'graph_gender.html', context))
+    return HttpResponse(render(request, 'clasConcepts_graph.html', context))

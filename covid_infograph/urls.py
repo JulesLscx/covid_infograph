@@ -34,4 +34,5 @@ urlpatterns = [
     path('interventionsgraph/', views.Intervention_Drug_by_Date_graph,
          name='Intervention_Drug_by_Date_graph'),
     path('registrygraph/', views.registry_graph, name='registry_graph'),
+    path('classConcepts/', views.clasConcepts_graph, name='clasConcepts_graph')
 ]
