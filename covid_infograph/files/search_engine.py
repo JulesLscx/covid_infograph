@@ -20,5 +20,5 @@ def searching(*, text: str):
             {'interventions': {'$regex': text, '$options': "i"}},
             {'abstract': {'$regex': text, '$options': "i"}}]
         }]).limit(10)
-        groupeElement[collection] = list(cursor)
+        groupeElement[i] = list(cursor)
     return groupeElement

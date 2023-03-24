@@ -7,10 +7,6 @@ import os
 from connection import SingletonMongoConnection as smc
 
 
-# file = pd.read_excel(
-#     './others/20200601_IRIT_clinicalTrials+publications.xlsx', engine='openpyxl')
-
-
 def get_maximum_rows(*, sheet_object):
     rows = 0
     for max_row, row in enumerate(sheet_object, 1):
@@ -156,8 +152,6 @@ def load_excel_file():
 
     file_path = os.path.join(
         file_dir, 'excels', '20200601_IRIT_clinicalTrials+publications.xlsx')
-
-    # Copilot ouvre le fichier en utf-8
     try:
         workbook = load_workbook(filename=file_path)
         workbook.encoding = 'utf-8'
