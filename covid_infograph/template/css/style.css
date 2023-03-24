@@ -71,3 +71,17 @@ Make sticky nav template with a in a nav
     max-height: 70px;
     padding: 0 20px;
 }
+
+.dashboard-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 20px;
+}
+
+.chart-div {
+    grid-column: 1 / 2;
+}
+
+.registrygraph-div {
+    grid-column: 2 / 3;
+}

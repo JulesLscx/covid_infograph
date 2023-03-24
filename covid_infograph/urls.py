@@ -21,7 +21,7 @@ urlpatterns = [
     path('get/<int:page>/<int:limit>',
          views.find_all, name='get_data'),
     path('get/<int:page>', views.find_all, name='get_data'),
-    path('', views.accueil, name='accueil'),
+    path('', views.dashboard, name='accueil'),
     path('display/<int:page>', views.display_data, name='display_data'),
     path('display/<int:page>/<int:limit>',
          views.display_data, name='display_data_limit'),
@@ -34,4 +34,5 @@ urlpatterns = [
     path('registrygraph/', views.registry_graph, name='registry_graph'),
     path('classConcepts/', views.clasConcepts_graph, name='clasConcepts_graph'),
     path('search/', views.search_api, name='search'),
+    path('dashboard/', views.dashboard, name='dashboard')
 ]
