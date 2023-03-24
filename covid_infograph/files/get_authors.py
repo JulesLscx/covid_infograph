@@ -33,4 +33,4 @@ def find_authors_clinical_gov():
                 {'_id': item['_id']}, {'$set': {'authors': authors}})
 
 
-find_authors_clinical_gov()
+
