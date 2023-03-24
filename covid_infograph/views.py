@@ -1,7 +1,7 @@
 import datetime
 from bson.json_util import dumps, loads
 import json
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from .files.variables import Keywords
 from .files.connection import SingletonMongoConnection as smc
 from django.shortcuts import render
@@ -370,7 +370,19 @@ def search_api(request):
         form = SearchForm(request.POST)
         if form.is_valid():
             results = searching(form.cleaned_data['search'])
+
     else:
         form = SearchForm()
 
     return render(request, 'search_page.html', {'form': form})
+
+
+def upload_file(request):
+    from .forms import UploadFileForm
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            return HttpResponseRedirect('/success/url/')
+    else:
+        form = UploadFileForm()
+    return render(request, 'upload.html', {'form': form})
