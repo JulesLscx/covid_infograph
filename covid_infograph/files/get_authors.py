@@ -33,5 +33,4 @@ def find_authors_clinical_gov():
                 {'_id': item['_id']}, {'$set': {'authors': authors}})
 
 
-if __name__ == '__main__':
-    find_authors_clinical_gov()
+find_authors_clinical_gov()

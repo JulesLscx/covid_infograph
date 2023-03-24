@@ -1,0 +1,38 @@
+import requests
+import pandas as pd
+from variables import Keywords
+from connection import SingletonMongoConnection as smc
+from bs4 import BeautifulSoup
+import re
+import PyPDF2
+from io import BytesIO
+
+def get_documents_without_authors(*, collection, registry) -> list[dict]:
+    result = smc.get_db()[collection].find(
+        {'registry': registry}, {'registry': 1, 'linkout': 1})
+    list_cursor = list(result)
+    return list_cursor
+
+
+def find_authors_publications():
+    collections = [Keywords.T_PUBLICATION_OBS.value,
+                   Keywords.T_PUBLICATION_RAND.value]
+    for collection in collections:
+        result = get_documents_without_authors(
+            registry='Publication', collection=collection)
+        print(result)
+        for item in result:
+            url = item['linkout']
+            if 'medrxiv' in url or 'doi' in url or 'onlinelibrary' in url:
+                r = requests.get(url)
+                pdf_data = BytesIO(r.content)
+                pdf_reader = PyPDF2.PdfFileReader(pdf_data)
+                authors = []
+                for i in range(pdf_reader.getNumPages()):
+                    page = pdf_reader.getPage(i)
+                    text = page.extractText()
+                    for line in text.split('\n'):
+                        if 'author' in line.lower() or 'authors' in line.lower():
+                            authors.append(line.replace('Author:', '').replace('Authors:', '').strip())
+                smc.get_db()[collection].update_one(
+                    {'_id': item['_id']}, {'$set': {'authors': authors}})
