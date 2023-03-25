@@ -1,4 +1,5 @@
 import datetime
+import os
 from bson.json_util import dumps, loads
 import json
 from django.http import HttpResponse, HttpResponseRedirect
@@ -382,7 +383,15 @@ def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            return HttpResponseRedirect('/success/url/')
+            handle_uploaded_file(request.FILES['file'])
+            return HttpResponseRedirect('/')
     else:
         form = UploadFileForm()
     return render(request, 'upload.html', {'form': form})
+
+
+def handle_uploaded_file(f):
+    _path = os.path.join('/covid_infograph/files/excels/', f.name)
+    with open(_path, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)

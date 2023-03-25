@@ -23,7 +23,12 @@
 
     <div id="example-table"></div>
 
-    <!-- <script src="{% static '/js/index.js' %}"></script> -->
+    <div class ="num_of_lines">
+      <p>
+      <span id = "value_nb_lines"></span>
+      <span> éléments</span>
+      </p>
+    </div>
 </body>
 
 </html>
@@ -70,13 +75,12 @@ function onclick_render(cell, formatterParams, onRendered) {
     let url = "{% url 'get_data' page limit  %}";
     const Http = new XMLHttpRequest();
     Http.open("GET", url);
-    const data = fetch(url);
     Http.send();
     Http.onreadystatechange = function() {
         if (this.readyState === 4 && this.status === 200) {
             try {
                 const tabledata = JSON.parse(Http.responseText.replace(/\n/g, ""));
-                console.log(tabledata);
+                document.getElementById("value_nb_lines").innerHTML = tabledata.length;
                 let col = get_column_dict(num_page, combo);
                 var table = new Tabulator("#example-table", {
                     data: tabledata, //assign data to table
@@ -150,10 +154,6 @@ document.getElementById("download-json").addEventListener("click", function(){
     table.download("json", "data.json");
 });
 
-//trigger download of data.xlsx file
-document.getElementById("download-xlsx").addEventListener("click", function(){
-    table.download("xlsx", "data.xlsx", {sheetName:"My Data"});
-});
 
 //trigger download of data.html file
 document.getElementById("download-html").addEventListener("click", function(){
@@ -169,7 +169,6 @@ document.getElementById("download-html").addEventListener("click", function(){
     };
 }
 make_all();
-
 
 // Appelle la fonction make_all
 

@@ -31,6 +31,3 @@ def find_authors_clinical_gov():
                 authors.append(contact.text.replace('Contact: ', ''))
             smc.get_db()[collection].update_one(
                 {'_id': item['_id']}, {'$set': {'authors': authors}})
-
-
-find_authors_clinical_gov()

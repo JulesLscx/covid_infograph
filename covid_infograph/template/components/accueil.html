@@ -10,24 +10,24 @@
     <a class="nav-item" href="{% url 'accueil' %}">Accueil</a>
     {% endif %}
     {% if page == 1 %}
-    <a class="nav-item current" href="{% url 'display_data' 1 %}">Clinical trials observationnal studies</a>
+    <a class="nav-item current" href="{% url 'display_data_limit' 1 0 %}">Clinical trials observationnal studies</a>
     {% else %}
-    <a class="nav-item" href="{% url 'display_data' 1 %}">Clinical trials observationnal studies</a>
+    <a class="nav-item" href="{% url 'display_data_limit' 1 0%}">Clinical trials observationnal studies</a>
     {% endif %}
     {% if page == 2 %}
-    <a class="nav-item current" href="{% url 'display_data' 2 %}">Clinical trials random trials</a>
+    <a class="nav-item current" href="{% url 'display_data_limit' 2 0%}">Clinical trials random trials</a>
     {% else %}
-    <a class="nav-item" href="{% url 'display_data' 2 %}">Clinical trials random trials</a>
+    <a class="nav-item" href="{% url 'display_data_limit' 2 0 %}">Clinical trials random trials</a>
     {% endif %}
     {% if page == 3 %}
-    <a class="nav-item current" href="{% url 'display_data' 3 %}">Publications observationnal studies</a>
+    <a class="nav-item current" href="{% url 'display_data_limit' 3 0 %}">Publications observationnal studies</a>
     {% else %}
-    <a class="nav-item" href="{% url 'display_data' 3 %}">Publications observationnal studies</a>
+    <a class="nav-item" href="{% url 'display_data_limit' 3 0%}">Publications observationnal studies</a>
     {% endif %}
     {% if page == 4 %}
-    <a class="nav-item current" href="{% url 'display_data' 4 %}">Publications random trials</a>
+    <a class="nav-item current" href="{% url 'display_data_limit' 4 0%}">Publications random trials</a>
     {% else %}
-    <a class="nav-item" href="{% url 'display_data' 4 %}">Publications random trials</a>
+    <a class="nav-item" href="{% url 'display_data_limit' 4 0%}">Publications random trials</a>
     {% endif %}
 
 </nav>
