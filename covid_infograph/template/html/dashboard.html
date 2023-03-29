@@ -1,3 +1,20 @@
 
 {% load static %}
 {% include 'accueil.html' %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="chart-div">
+        {{ chart_div|safe }}
+    </div>
+    <div class="registrygraph-div">
+        {{ registrygraph_div|safe }}
+    </div>
+</div>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% include 'footer.html' %}

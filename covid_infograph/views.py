@@ -12,6 +12,7 @@ from plotly import express as px
 from plotly import graph_objects as go
 import pandas as pd
 from django import forms
+from .graph import *
 
 
 def find_all(request, page, limit=100):
@@ -91,7 +92,14 @@ def display_data(request, page, limit=100):
 
 
 def accueil(request):
-    return HttpResponse(render(request, 'dashboard.html', {}))
+    chart_div = numberOfDataByPublicationDate()
+    registrygraph_div = registery_graph()
+    # Render the dashboard with the two graphs
+    context = {
+        'chart_div': chart_div,
+        'registrygraph_div': registrygraph_div
+    }
+    return render(request, 'dashboard.html', context)
 
 
 def all_date_graph(request):
@@ -360,22 +368,6 @@ def clasConcepts_graph(request):
         'clasConceptsgraph': clasConceptsgraph
     }
     return HttpResponse(render(request, 'clasConcepts_graph.html', context))
-
-
-def search_api(request):
-    from .forms import SearchForm
-    from .files.search_engine import searching
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = SearchForm(request.POST)
-        if form.is_valid():
-            results = searching(form.cleaned_data['search'])
-
-    else:
-        form = SearchForm()
-
-    return render(request, 'search_page.html', {'form': form})
 
 
 def upload_file(request):

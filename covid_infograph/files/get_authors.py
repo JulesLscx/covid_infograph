@@ -55,3 +55,7 @@ def find_authors_chictr():
 def init_scrap():
     find_authors_clinical_gov()
     find_authors_chictr()
+
+
+if __name__ == "__main__":
+    init_scrap()

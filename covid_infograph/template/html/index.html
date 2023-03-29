@@ -14,7 +14,6 @@
     <div>
     <button id="download-csv">Download CSV</button>
     <button id="download-json">Download JSON</button>
-    <button id="download-xlsx">Download XLSX</button>
     <button id="download-html">Download HTML</button>
 </div>
 <div>
@@ -88,7 +87,7 @@ function onclick_render(cell, formatterParams, onRendered) {
                     renderHorizontal: "virtual",
                     layout: "fitColumns",
                     pagination: "local",
-                    paginationSize: 25,
+                    paginationSize: 10,
                     paginationSizeSelector:[10, 25, 50, 100],
                     columns: col,
                     rowFormatter: function(row, e) {
@@ -176,3 +175,5 @@ make_all();
 
   </script>
 {% endblock %}
+
+{% include 'footer.html' %}

@@ -355,7 +355,7 @@ function get_column_dict(page, combo) {
             },
             {
                 title: "Document Type",
-                field: "docType",
+                field: "doctype",
                 visible: true,
                 sorter: "string",
                 headerFilter: "input",
