@@ -14,6 +14,7 @@ import pandas as pd
 from django import forms
 from .forms import DateForm
 from .graph import *
+from django.http import JsonResponse
 
 
 def find_all(request, page, limit=100):
@@ -365,3 +366,35 @@ def handle_uploaded_file(f):
     with open(_path, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
+
+
+def rechercheText(request, text):
+    print(text)
+    collections = [
+        Keywords.T_CLINICALTRIALS_OBS.value,
+        Keywords.T_CLINICALTRIALS_RAND.value,
+        Keywords.T_PUBLICATION_OBS.value,
+        Keywords.T_PUBLICATION_RAND.value
+    ]
+    groupeElement = []
+    for i, collection in enumerate(collections):
+        cursor = smc.get_db()[collection].aggregate([
+            {
+                "$match": {
+                    "title": {
+                        "$regex": text,
+                        "$options": "i"
+                    }
+                }
+            },
+            {
+                "$limit": 500
+            }
+        ])
+        list_cursor = list(cursor)
+        groupeElement += list_cursor
+    return JsonResponse(groupeElement, safe=False)
+
+
+def recherchePage(request):
+    return render(request, 'recherche.html')
