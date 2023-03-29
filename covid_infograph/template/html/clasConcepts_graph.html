@@ -1,5 +1,11 @@
+
+
 {% block content %}
+    <form method="GET" action="{% url 'clasConcepts_graph' %}">
+        {{ form.as_p }}
 
-{{ clasConceptsgraph|safe }}
-
-{% endblock %}
+        <button>Submit</button>
+    </form>
+    
+    {{ clasConceptsgraph|safe }}
+{% endblock content %}

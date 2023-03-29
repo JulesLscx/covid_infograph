@@ -1,3 +1,5 @@
+from covid_infograph.forms import DateForm
+from plotly import graph_objects as go
 from .files.variables import Keywords
 from .files.connection import SingletonMongoConnection as smc
 from plotly import express as px
@@ -101,3 +103,39 @@ def registery_graph():
         full_html=False,
         default_height=600, default_width=700, include_plotlyjs='cdn')
     return registrygraph_div
+
+
+def clasConcepts_graph(request):
+
+    month = request.GET.get('month')
+
+    if month is None:
+        request = [{'$unwind': {'path': "$concepts", 'preserveNullAndEmptyArrays': False}}, {"$group": {'_id': {
+            'concepts': "$concepts"}, 'count': {"$sum": 1}}}, {"$sort": {'count': -1}}, {'$limit': 100}]
+    else:
+        request = [{'$unwind': {'path': "$concepts", 'preserveNullAndEmptyArrays': False}}, {"$group": {'_id': {'date': {"$dateToString": {'format': '%m-%Y',
+                                                                                                                                           'date': "$datePublished"}}, 'concepts': "$concepts"}, 'count': {"$sum": 1}}}, {'$match': {'_id.date': month}}, {"$sort": {'date': 1, 'count': -1}}, {'$limit': 100}]
+    collections = [Keywords.T_PUBLICATION_OBS.value,
+                   Keywords.T_PUBLICATION_RAND.value]
+    dict_df = {"concepts": [], "count": []}
+    for i, collection in enumerate(collections):
+        cursor = smc.get_db()[collection].aggregate(
+            request, allowDiskUse=True)
+        list_cursor = list(cursor)
+        for item in list_cursor:
+            dict_df["concepts"].append(item["_id"]['concepts'])
+            dict_df["count"].append(item["count"])
+    df = pd.DataFrame(dict_df)
+    df = df.groupby(['concepts'], as_index=False).sum(numeric_only=True).sort_values(
+        by=['count'], ascending=False)
+    clasConceptsgraph = go.Figure(data=[go.Table(header=dict(values=['Concepts', 'Nombre']),
+                                                 cells=dict(values=[df['concepts'], df['count']]))
+                                        ])
+
+    clasConceptsgraph = clasConceptsgraph.to_html(
+        full_html=False,
+        include_plotlyjs='cdn')
+    context = {
+        'clasConceptsgraph': clasConceptsgraph,
+        'form': DateForm()}
+    return context

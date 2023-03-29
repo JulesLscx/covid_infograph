@@ -12,6 +12,7 @@ from plotly import express as px
 from plotly import graph_objects as go
 import pandas as pd
 from django import forms
+from .forms import DateForm
 from .graph import *
 
 
@@ -94,10 +95,15 @@ def display_data(request, page, limit=100):
 def accueil(request):
     chart_div = numberOfDataByPublicationDate()
     registrygraph_div = registery_graph()
+    tmp = clasConcepts_graph(request)
+    concept_form = tmp['form']
+    concept_table = tmp['clasConceptsgraph']
     # Render the dashboard with the two graphs
     context = {
         'chart_div': chart_div,
-        'registrygraph_div': registrygraph_div
+        'registrygraph_div': registrygraph_div,
+        'form': concept_form,
+        'clasConceptsgraph': concept_table
     }
     return render(request, 'dashboard.html', context)
 
@@ -340,34 +346,6 @@ def Intervention_Drug_by_Date_graph(request):
         'interventionsgraph': chart
     }
     return HttpResponse(render(request, 'graph_interventions.html', context))
-
-
-def clasConcepts_graph(request):
-    collections = [Keywords.T_PUBLICATION_OBS.value,
-                   Keywords.T_PUBLICATION_RAND.value]
-    dict_df = {"concepts": [], "count": [], "collection": []}
-    for i, collection in enumerate(collections):
-        cursor = smc.get_db()[collection].aggregate(
-            [{'$unwind': {'path': "$concepts", 'preserveNullAndEmptyArrays': False}}, {"$group": {'_id': {'date': {"$dateToString": {'format': '%Y-%m', 'date': "$datePublished"}}, 'concepts': "$concepts"}, 'count': {"$sum": 1}}}, {"$sort": {'date': 1, 'count': -1}}, {'$limit': 100}], allowDiskUse=True)
-        list_cursor = list(cursor)
-        for item in list_cursor:
-            dict_df["concepts"].append(item["_id"]['concepts'])
-            dict_df["count"].append(item["count"])
-            dict_df["collection"].append(collection)
-    df = pd.DataFrame(dict_df)
-    classement = list(range(1, 101))
-    print(df.head())
-    clasConceptsgraph = go.Figure(data=[go.Table(header=dict(values=['Classement', 'Concepts', 'Nombre']),
-                                                 cells=dict(values=[classement, df['concepts'], df['count']]))
-                                        ])
-
-    clasConceptsgraph = clasConceptsgraph.to_html(
-        full_html=False,
-        include_plotlyjs='cdn')
-    context = {
-        'clasConceptsgraph': clasConceptsgraph
-    }
-    return HttpResponse(render(request, 'clasConcepts_graph.html', context))
 
 
 def upload_file(request):

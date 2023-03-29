@@ -111,13 +111,6 @@ footer>div {
 .dashboard-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, 1fr);
     grid-gap: 20px;
-}
-
-.chart-div {
-    grid-column: 1 / 2;
-}
-
-.registrygraph-div {
-    grid-column: 2 / 3;
 }
