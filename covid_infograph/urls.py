@@ -21,7 +21,7 @@ urlpatterns = [
     path('get/<int:page>/<int:limit>',
          views.find_all, name='get_data'),
     path('get/<int:page>', views.find_all, name='get_data'),
-    path('', views.dashboard, name='accueil'),
+    path('', views.accueil, name='accueil'),
     path('display/<int:page>', views.display_data, name='display_data'),
     path('display/<int:page>/<int:limit>',
          views.display_data, name='display_data_limit'),
