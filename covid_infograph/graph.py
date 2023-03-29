@@ -42,8 +42,6 @@ def numberOfDataByPublicationDate():
     end_date = "2020-12-31"
     start_date = "2020-01-01"
     chart.update_xaxes(type="date", range=[start_date, end_date])
-    min_date = df['date'].min()
-    max_date = df['date'].max()
     chart.update_layout(
         xaxis=dict(
             rangeselector=dict(
@@ -70,7 +68,7 @@ def numberOfDataByPublicationDate():
             rangeslider=dict(
                 visible=True
             ),
-            type="date"
+            type="date",
         )
     )
     chart_div = chart.to_html(
@@ -98,7 +96,7 @@ def registery_graph():
         df,
         values="count",
         names="registry",
-        title="Nombre de données par registre")
+        title="Nombre d'études par registre")
     registrygraph_div = registrygraph.to_html(
         full_html=False,
         default_height=600, default_width=700, include_plotlyjs='cdn')
@@ -130,7 +128,7 @@ def clasConcepts_graph(request):
         by=['count'], ascending=False)
 
     clasConceptsgraph = px.bar(df, x='count', y='concepts',
-                               title="Nombre de données par concepts clés", color='concepts', orientation='h', height=1000)
+                               title="Nombre de publications par concepts clés", color='concepts', orientation='h', height=1000)
 
     clasConceptsgraph = clasConceptsgraph.to_html(
         full_html=False,
@@ -149,7 +147,7 @@ def clasVenue_month(request):
         request = [{'$match': {
             "venue": {'$exists': True,
                       '$ne': None
-                      }}}, {'$group': {'_id': "$venue", 'count': {'$sum': 1}}}, {
+                      }}}, {'$group': {'_id': {'venue': "$venue"}, 'count': {'$sum': 1}}}, {
             '$sort': {'count': -1}}, {'$limit': 10}]
     else:
         request = [{'$match': {
@@ -163,17 +161,14 @@ def clasVenue_month(request):
             request, allowDiskUse=True)
         list_cursor = list(cursor)
         for item in list_cursor:
-            try:
-                dict_df["venue"].append(item["_id"]['venue'])
-            except:
-                dict_df["venue"].append(item["_id"])
+            dict_df["venue"].append(item["_id"]['venue'])
             dict_df["count"].append(item["count"])
     df = pd.DataFrame(dict_df)
     df = df.groupby(['venue'], as_index=False).sum(
         numeric_only=True).sort_values(by=['count'], ascending=False)
 
     clasVenue_monthgraph = px.bar(df, x='count', y='venue',
-                                  title="Nombre de données par venue", color='venue', orientation='h', height=1000)
+                                  title="Nombre de données par Revue", color='venue', orientation='h', height=1000)
     clasVenue_monthgraph = clasVenue_monthgraph.to_html(
         full_html=False,
         include_plotlyjs='cdn')
@@ -194,7 +189,6 @@ def phase_graph():
             dict_df["collection"].append(collection)
     df = pd.DataFrame(dict_df)
     df.sort_values(by=["phase", "collection"], inplace=True)
-    print(df.head())
     phasegraph = px.bar(
         df,
         x="phase",
@@ -233,11 +227,11 @@ def group_by_gender_graph():
         x="gender",
         y="count",
         color="collection",
-        title="Nombre d'intervention de type Drug par date")
+        title="Nombre d'études par sexe")
 
     genregraph.update_layout(
-        xaxis_title="Date",
-        yaxis_title="Nombre d'intervention de type Drug"
+        xaxis_title="Sexe",
+        yaxis_title="Nombre d'études"
     )
     genregraph = genregraph.to_html(
         full_html=False,
@@ -274,7 +268,6 @@ def Intervention_Drug_by_Date_graph():
             dict_df["count"].append(item['count'])
             dict_df['collection'].append(collection)
     df = pd.DataFrame(dict_df)
-    print(df.head())
     chart = px.bar(
         df,
         x='date',
@@ -282,6 +275,9 @@ def Intervention_Drug_by_Date_graph():
         color='collection',
         title='Nombre d\intervention de type Drug par dates'
     )
+    end_date = "2020-12-31"
+    start_date = "2020-01-01"
+    chart.update_xaxes(type="date", range=[start_date, end_date])
     chart.update_layout(
         xaxis=dict(
             rangeselector=dict(
@@ -309,6 +305,7 @@ def Intervention_Drug_by_Date_graph():
                 visible=True
             ),
             type="date"
+
         )
     )
     chart = chart.to_html(

@@ -5,7 +5,7 @@
 <!-- A for loop of i iterations in django to sysout n links with the structure localhost/display/i -->
 <nav class="nav-bar">
 
-    {% if request.get_full_path == '/' %}
+    {% if request.path == '/' %}
     <a class="nav-item current" href="{% url 'accueil' %}">Accueil</a>
     {% else %}
     <a class="nav-item" href="{% url 'accueil' %}">Accueil</a>
