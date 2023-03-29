@@ -2,6 +2,13 @@
 {% include 'accueil.html' %}
 
 {% block content %}
+<div class="date_sticky_picker">
+    <form method="GET" action="{% url 'accueil' %}" class="month_picker">
+        {{ form.as_p }}
+        <button>Submit</button>
+    </form>
+</div>
+
 <div class="dashboard-container">
     <div class="chart-div">
         {{ chart_div|safe }}
@@ -9,16 +16,24 @@
     <div class="registrygraph-div">
         {{ registrygraph_div|safe }}
     </div>
-    <div class="">
-        <form method="GET" action="{% url 'accueil' %}">
-            {{ form.as_p }}
-            <button>Submit</button>
-        </form>
-
+    <div class="venue">
         {{ clasConceptsgraph|safe }}
     </div>
 
+    <div>
+        {{ gender |safe}}
+    </div>
+    <div>
+        {{ intervention_drug |safe}}
+    </div>
+    <div>
+        {{ phase |safe}}
+    </div>
+    <div class="venue">
+        {{ chartVenue|safe }}
+    </div>
 </div>
+
 {% endblock %}
 
 {% block css %}

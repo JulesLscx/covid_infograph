@@ -274,7 +274,8 @@ function get_column_dict(page, combo) {
                 visible: true,
                 width: 450,
                 sorter: "string",
-                formatter: "textarea"
+                formatter: "textarea",
+                headerFilter: "input",
             },
             {
                 title: "Abstract",
@@ -435,6 +436,8 @@ function get_column_dict(page, combo) {
                 sorter: "string",
                 formatter: "textarea",
                 maxInitialWidth: 400,
+                headerFilter: "input",
+                headerFilterLiveFilter: false,
                 width: 400
             },
             {

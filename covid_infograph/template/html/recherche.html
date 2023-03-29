@@ -5,12 +5,14 @@
     width: 100%;
     min-height: 50vh;
   }
+
   .search {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
   }
+
   .card {
     display: inline-block;
     width: 80%;
@@ -22,18 +24,22 @@
     font-family: Arial, sans-serif;
     font-size: 14px;
   }
+
   .card h2 {
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 10px;
   }
+
   .card p {
     line-height: 1.5;
   }
+
   .card ul {
     list-style: none;
     line-height: 1.5;
   }
+
   .card ul li:before {
     content: "• ";
     color: #007bff;
@@ -42,67 +48,71 @@
     width: 1em;
     margin-left: -1em;
   }
+
   .card a {
     color: #007bff;
     text-decoration: none;
     font-weight: bold;
   }
+
   .nolink {
     color: #7a7a7a;
     text-decoration: none;
     font-weight: bold;
   }
+
   .searcheditems {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-top: 10px;
   }
+
   .searchcontainer {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-top: 10px;
   }
+
   .flex {
     display: flex;
   }
+
   .gap {
     gap: 5px;
   }
 </style>
 <html>
-  {% load static %} {% include 'accueil.html' %}
-  <link
-    href="{% static '/dist/css/tabulator_modern.min.css' %}"
-    rel="stylesheet"
-  />
+{% load static %} {% include 'accueil.html' %}
+<link href="{% static '/dist/css/tabulator_modern.min.css' %}" rel="stylesheet" />
 
-  <head>
-    <title>Recherche</title>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="{% static '/css/style.css' %}" />
-  </head>
+<head>
+  <title>Recherche</title>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="{% static '/css/style.css' %}" />
+</head>
 
-  <body>
-    <div class="content">
-      <div class="search">
-        <form id="form">
-          <input type="text" id="search" />
-          <button>Recherche</button>
-        </form>
-      </div>
-      <div class="searchcontainer">
-        <p>
-          Vous pouvez rechercher des informations sur le covid-19 en utilisant
-          le champ de recherche ci-dessus.
-        </p>
-        <p id="searchtime"></p>
-        <div class="searcheditems" id="searcheditems"></div>
-      </div>
+<body>
+  <div class="content">
+    <div class="search">
+      <form id="form">
+        <input type="text" id="search" />
+        <button>Recherche</button>
+      </form>
+    </div>
+    <div class="searchcontainer">
+      <p>
+        Vous pouvez rechercher des informations sur le covid-19 en utilisant
+        le champ de recherche ci-dessus.
+      </p>
+      <p id="searchtime"></p>
       <div class="searcheditems" id="searcheditems"></div>
     </div>
-  </body>
+    <div class="searcheditems" id="searcheditems"></div>
+  </div>
+</body>
+
 </html>
 
 <script>
@@ -113,7 +123,7 @@
   async function Search() {
     const text = document.getElementById("search").value;
     const startDate = new Date();
-    const response = await fetch(`http://127.0.0.1:8000/search/${text}`);
+    const response = await fetch(`/search/${text}`);
     const data = await response.json();
     const numberOfResults = data.length;
     searchTime(startDate, numberOfResults);
@@ -128,9 +138,8 @@
     const searchtime = document.getElementById("searchtime");
     const endDate = new Date();
     const time = (endDate.getTime() - startDate.getTime()) / 1000;
-    searchtime.innerHTML = `Environ ${numberOfResults} résultats ( ${time} secondes) pour <strong>${
-      document.getElementById("search").value
-    }</strong>`;
+    searchtime.innerHTML = `Environ ${numberOfResults} résultats ( ${time} secondes) pour <strong>${document.getElementById("search").value
+      }</strong>`;
   }
 
   function createCard(item) {
@@ -155,7 +164,8 @@
   }
 
   function Abstract(item) {
-    if (item.abstract === null || item.abstract === undefined) return "";
+    if (item.abstract === null || item.abstract === undefined) item.abstract = "Pas d'abstract";
+    console.log(item)
     const MAX_LENGTH = 300;
     let isTruncated = true;
     let abstractToShow = item.abstract.slice(0, MAX_LENGTH);
@@ -193,9 +203,8 @@
       item.venue !== null && item.venue !== "" && item.venue !== undefined
         ? `<p>${item.venue}</p>`
         : "";
-    return `<div class="flex gap">${sourcelink} ${
-      journal != "" ? "|" : ""
-    } ${journal}</div>`;
+    return `<div class="flex gap">${sourcelink} ${journal != "" ? "|" : ""
+      } ${journal}</div>`;
   }
   function dateInserted(date) {
     if (date === null || date === undefined) return "";

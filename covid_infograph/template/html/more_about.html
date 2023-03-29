@@ -1,0 +1,83 @@
+{% load static %}
+<link rel="stylesheet" href="{% static './css/style.css' %}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% include 'accueil.html' %}
+
+<!-- A for loop of i iterations in django to sysout n links with the structure localhost/display/i -->
+
+<nav class="bloc-info">
+    <div>
+        <p>Projet réalisé par :</p>
+        <ul>
+            <li> 01/06/2020 </li>
+            <li>Collecte de notices bibliographiques (publications et essais cliniques) via Dimensions.ai </li>
+            <li> guillaume.cabanac@univ-tlse3.fr </li>
+            <li> Équipe IRIS, IRIT UMR 5505, Université Paul Sabatier - Toulouse 3</li>
+        </ul>
+    </div>
+    <div>
+        <h2>1 - ClinicalTrials_ObsStudies</h2>
+        <p>search clinical_trials in full_data</p>
+        <p>for "(\"2019-nCoV\" OR \"COVID-19\" OR \"SARS-CoV-2\" OR \"HCoV-2019\" OR \"hcov\" OR \"NCOVID-19\" OR
+            \"severe acute respiratory syndrome coronavirus 2\" OR \"severe acute respiratory syndrome corona virus 2\"
+            OR ((\"coronavirus\" OR \"corona virus\") AND (Wuhan OR China OR novel))) AND (\"observational stud*\" OR
+            cohort* OR \"non random*\" OR nonrandom*)"</p>
+        <p>return
+            clinical_trials[abstract+acronym+conditions+date+date_inserted+gender+id+interventions+linkout+phase+registry+title]
+        </p>
+        <p>sort by date_inserted desc</p>
+    </div>
+    <div>
+        <h2>2 - ClinicalTrials_RandTrials</h2>
+        <p>search clinical_trials in full_data</p>
+        <p>for "(\"2019-nCoV\" OR \"COVID-19\" OR \"SARS-CoV-2\" OR \"HCoV-2019\" OR \"hcov\" OR \"NCOVID-19\" OR
+            \"severe acute respiratory syndrome coronavirus 2\" OR \"severe acute respiratory syndrome corona virus 2\"
+            OR ((\"coronavirus\" OR \"corona virus\") AND (Wuhan OR China OR novel))) AND (randomi?ed OR randomly OR
+            placebo OR trial OR group OR groups)"</p>
+        <p>return
+            clinical_trials[abstract+acronym+conditions+date+date_inserted+gender+id+interventions+linkout+phase+registry+title]
+        </p>
+        <p>sort by date_inserted desc</p>
+    </div>
+    <div>
+        <h2>3 - Publications_ObsStudies</h2>
+        <p>search publications in title_abstract_only</p>
+        <p>for "(\"2019-nCoV\" OR \"COVID-19\" OR \"SARS-CoV-2\" OR \"HCoV-2019\" OR \"hcov\" OR \"NCOVID-19\" OR
+            \"severe acute respiratory syndrome coronavirus 2\" OR \"severe acute respiratory syndrome corona virus 2\"
+            OR ((\"coronavirus\" OR \"corona virus\") AND (Wuhan OR China OR novel))) AND (\"observational stud*\" OR
+            cohort* OR \"non random*\" OR nonrandom*)"</p>
+        <p>return publications
+            [id+year+date+date_inserted+type+doi+title+journal+proceedings_title+publisher+book_title+linkout+pmid+times_cited+altmetric+open_access_categories+concepts+mesh_terms]
+        </p>
+        <p>sort by date_inserted desc</p>
+    </div>
+    <div>
+        <h2>4 - Publications_RandTrials</h2>
+        <p>search publications in title_abstract_only</p>
+        <p>for "(\"2019-nCoV\" OR \"COVID-19\" OR \"SARS-CoV-2\" OR \"HCoV-2019\" OR \"hcov\" OR \"NCOVID-19\" OR
+            \"severe acute respiratory syndrome coronavirus 2\" OR \"severe acute respiratory syndrome corona virus 2\"
+            OR ((\"coronavirus\" OR \"corona virus\") AND (Wuhan OR China OR novel))) AND (randomi?ed OR randomly OR
+            placebo OR trial OR group OR groups)"</p>
+        <p>return publications
+            [id+year+date+date_inserted+type+doi+title+journal+proceedings_title+publisher+book_title+linkout+pmid+times_cited+altmetric+open_access_categories+concepts+mesh_terms]
+        </p>
+        <p>sort by date_inserted desc</p>
+    </div>
+    <div>
+        <h4>NB : title_abstract_only pour 3 et 4 (mais on peut faire full_data si c'est plus pertinent)</h4>
+    </div>
+    <div>
+        <ul>
+            <li>
+                <a href="https://bit.ly/IRIT-CRESS-observationalStudies"> IRIT CRESS observationalStudies</a>
+            </li>
+            <li>
+                <a href="https://bit.ly/IRIT-CRESS-randomizedTrials"> IRIT CRESS randomizedTrials</a>
+            </li>
+        </ul>
+    </div>
+
+</nav>
+
+
+{% include 'footer.html' %}
