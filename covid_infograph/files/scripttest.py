@@ -128,6 +128,7 @@ def insert_dic_in_mongo(*, dic_list, collection):
     Returns:
         _id str:Le dernière id inséré dans la collection (donc si pas le dernier de la liste c'est qu'il y a eu une erreur)
     """
+
     for dic in dic_list:
         try:
             collection.insert_one(dic)
@@ -170,7 +171,7 @@ def dump_all_excel_in_mongo():
     workbook = load_excel_file()
     for i, sheet in enumerate(sheets):
         dic_list = create_dic_by_sheet(sheet_object=workbook[sheet])
-        smc.get_db()[collections[i]].insert_many(dic_list)
+        smc.get_db()[collections[i]].insert_many(dic_list, ordered=False)
 
 
 def test_insert_one_dic_in_mongo():

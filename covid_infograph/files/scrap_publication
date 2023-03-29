@@ -6,33 +6,37 @@ from bs4 import BeautifulSoup
 import re
 import PyPDF2
 from io import BytesIO
+from get_authors import get_documents_without_authors
 
-def get_documents_without_authors(*, collection, registry) -> list[dict]:
-    result = smc.get_db()[collection].find(
-        {'registry': registry}, {'registry': 1, 'linkout': 1})
-    list_cursor = list(result)
-    return list_cursor
+# Fonction pour extraire les noms et prénoms des auteurs à partir d'un texte donné
+def extract_author_names(text):
+    author_names = []
+    for line in text.split('\n'):
+        if 'author' in line.lower() or 'authors' in line.lower():
+            match = re.search(r'^([A-Z][a-z]*), ([A-Z][a-z]*)', line)
+            if match:
+                author_names.append({'last_name': match.group(1), 'first_name': match.group(2)})
+    return author_names
 
+# Fonction pour extraire les noms et prénoms des auteurs à partir d'un fichier PDF donné
+def extract_authors_from_pdf(pdf_data):
+    pdf_reader = PyPDF2.PdfFileReader(pdf_data)
+    authors = []
+    for i in range(pdf_reader.getNumPages()):
+        page = pdf_reader.getPage(i)
+        text = page.extractText()
+        author_names = extract_author_names(text)
+        authors += author_names
+    return authors
 
-def find_authors_publications():
-    collections = [Keywords.T_PUBLICATION_OBS.value,
-                   Keywords.T_PUBLICATION_RAND.value]
-    for collection in collections:
-        result = get_documents_without_authors(
-            registry='Publication', collection=collection)
-        print(result)
-        for item in result:
-            url = item['linkout']
-            if 'medrxiv' in url or 'doi' in url or 'onlinelibrary' in url:
-                r = requests.get(url)
-                pdf_data = BytesIO(r.content)
-                pdf_reader = PyPDF2.PdfFileReader(pdf_data)
-                authors = []
-                for i in range(pdf_reader.getNumPages()):
-                    page = pdf_reader.getPage(i)
-                    text = page.extractText()
-                    for line in text.split('\n'):
-                        if 'author' in line.lower() or 'authors' in line.lower():
-                            authors.append(line.replace('Author:', '').replace('Authors:', '').strip())
-                smc.get_db()[collection].update_one(
-                    {'_id': item['_id']}, {'$set': {'authors': authors}})
+# Parcourir les collections de base de données pour extraire les noms et prénoms des auteurs
+collections = [Keywords.T_PUBLICATION_OBS.value, Keywords.T_PUBLICATION_RAND.value]
+for collection in collections:
+    result = get_documents_without_authors(registry='Publication', collection=collection)
+    for item in result:
+        url = item['linkout']
+        if 'medrxiv' in url or 'doi' in url or 'onlinelibrary' in url:
+            r = requests.get(url)
+            pdf_data = BytesIO(r.content)
+            authors = extract_authors_from_pdf(pdf_data)
+            smc.get_db()[collection].update_one({'_id': item['_id']}, {'$set': {'authors': authors}})

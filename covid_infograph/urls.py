@@ -33,6 +33,5 @@ urlpatterns = [
          name='Intervention_Drug_by_Date_graph'),
     path('registrygraph/', views.registry_graph, name='registry_graph'),
     path('classConcepts/', views.clasConcepts_graph, name='clasConcepts_graph'),
-    path('search/', views.search_api, name='search'),
-    path('dashboard/', views.dashboard, name='dashboard')
+    path('upload/', views.upload_file, name='upload'),
 ]
