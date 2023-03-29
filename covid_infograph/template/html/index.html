@@ -44,7 +44,10 @@
     // Récupérer les données du serveur
     loadData(`{% url 'get_data' page limit %}`)
       .then((tableData) => {
+        // Définir le nombre de lignes
+        document.getElementById("value_nb_lines").innerHTML = tableData.length;
         // Définir les colonnes
+
         const columns = get_column_dict(
           num_page,
           JSON.parse("{{ combo|escapejs }}")
