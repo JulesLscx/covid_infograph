@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<style>
+  .content {
+    padding-top: 30px;
+    width: 100%;
+    min-height: 50vh;
+  }
+  .search {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  .card {
+    display: inline-block;
+    width: 80%;
+    margin: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+  }
+  .card h2 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  .card p {
+    line-height: 1.5;
+  }
+  .card ul {
+    list-style: none;
+    line-height: 1.5;
+  }
+  .card ul li:before {
+    content: "• ";
+    color: #007bff;
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+  }
+  .card a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  .nolink {
+    color: #7a7a7a;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  .searcheditems {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+  }
+  .searchcontainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+  }
+  .flex {
+    display: flex;
+  }
+  .gap {
+    gap: 5px;
+  }
+</style>
+<html>
+  {% load static %} {% include 'accueil.html' %}
+  <link
+    href="{% static '/dist/css/tabulator_modern.min.css' %}"
+    rel="stylesheet"
+  />
+
+  <head>
+    <title>Recherche</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="{% static '/css/style.css' %}" />
+  </head>
+
+  <body>
+    <div class="content">
+      <div class="search">
+        <form id="form">
+          <input type="text" id="search" />
+          <button>Recherche</button>
+        </form>
+      </div>
+      <div class="searchcontainer">
+        <p>
+          Vous pouvez rechercher des informations sur le covid-19 en utilisant
+          le champ de recherche ci-dessus.
+        </p>
+        <p id="searchtime"></p>
+        <div class="searcheditems" id="searcheditems"></div>
+      </div>
+      <div class="searcheditems" id="searcheditems"></div>
+    </div>
+  </body>
+</html>
+
+<script>
+  document.querySelector("form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    Search();
+  });
+  async function Search() {
+    const text = document.getElementById("search").value;
+    const startDate = new Date();
+    const response = await fetch(`http://127.0.0.1:8000/search/${text}`);
+    const data = await response.json();
+    const numberOfResults = data.length;
+    searchTime(startDate, numberOfResults);
+    const searchedItem = document.getElementById("searcheditems");
+    searchedItem.innerHTML = "";
+    // boucle à travers chaque élément dans la réponse de l'API
+    for (let item of data) {
+      searchedItem.appendChild(createCard(item));
+    }
+  }
+  function searchTime(startDate, numberOfResults) {
+    const searchtime = document.getElementById("searchtime");
+    const endDate = new Date();
+    const time = (endDate.getTime() - startDate.getTime()) / 1000;
+    searchtime.innerHTML = `Environ ${numberOfResults} résultats ( ${time} secondes) pour <strong>${
+      document.getElementById("search").value
+    }</strong`;
+  }
+
+  function createCard(item) {
+    const div = document.createElement("div");
+    div.classList.add("card");
+    console.log(item);
+
+    div.innerHTML = `
+      <h2>${item.title}</h2>
+      <div class="flex gap">
+        ${dateInserted(item.dateInserted)}
+        |
+        <p>${item.registry || "Pas de registry"}</p>
+      </div>
+        <div id="abstract-container"></div>
+      ${source(item)}
+    `;
+    const abstractContainer = div.querySelector("#abstract-container");
+    if (abstractContainer !== null) {
+      abstractContainer.appendChild(Abstract(item));
+    }
+    return div;
+  }
+
+  function Abstract(item) {
+    if (item.abstract === null || item.abstract === undefined) return "";
+    const MAX_LENGTH = 300;
+    let isTruncated = true;
+    let abstractToShow = item.abstract.slice(0, MAX_LENGTH);
+    const div = document.createElement("div");
+    const sizeButton = document.createElement("button");
+    sizeButton.innerHTML = "Voir plus";
+
+    const fullAbstract = `<p>${item.abstract}</p>`;
+    const truncatedAbstract = `<p>${abstractToShow}...</p>`;
+    const abstractElement = document.createElement("div");
+    abstractElement.innerHTML = truncatedAbstract;
+    sizeButton.addEventListener("click", () => {
+      if (isTruncated) {
+        abstractElement.innerHTML = fullAbstract;
+        sizeButton.innerHTML = "Voir moins";
+        isTruncated = false;
+      } else {
+        abstractElement.innerHTML = truncatedAbstract;
+        sizeButton.innerHTML = "Voir plus";
+        isTruncated = true;
+      }
+    });
+    div.appendChild(abstractElement);
+    div.appendChild(sizeButton);
+
+    return div;
+  }
+
+  function source(item) {
+    const sourcelink =
+      item.linkout !== null && item.linkout !== "" && item.linkout !== undefined
+        ? `<a href="${item.linkout}" target="_blank">Lien vers la source</a>`
+        : `<p class="nolink">Pas de source</p>`;
+    const journal =
+      item.venue !== null && item.venue !== "" && item.venue !== undefined
+        ? `<p>${item.venue}</p>`
+        : "";
+    return `<div class="flex gap">${sourcelink} ${
+      journal != "" ? "|" : ""
+    } ${journal}</div>`;
+  }
+  function dateInserted(date) {
+    if (date === null || date === undefined) return "";
+    const dateInserted = new Date(date);
+    return `<p>${Intl.DateTimeFormat("fr-FR", {
+      dateStyle: "medium",
+    }).format(dateInserted)}</p>`;
+  }
+</script>
+{% include 'footer.html' %}

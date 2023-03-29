@@ -99,7 +99,6 @@
   }
 
   function rowFormatter(row, e) {
-
     //create and style holder elements
     var holderEl = document.createElement("div");
     var tableEl = document.createElement("div");
@@ -122,7 +121,8 @@
     row.getElement().appendChild(holderEl);
     tableEl.setAttribute("class", "subTable" + id + "");
     if (
-      !(row.getData().interventions === null) &&
+      row.getData().interventions !== null &&
+      row.getData().interventions !== undefined &&
       row.getData().interventions.length > 0
     ) {
       var subTable = new Tabulator(tableEl, {
@@ -180,6 +180,6 @@
     });
   }
 
-  init({{ page }}, {{ limit }});
+  init("{{ page }}", "{{ limit }}");
 </script>
 {% endblock %} {% include 'footer.html' %}
