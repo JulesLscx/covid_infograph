@@ -34,4 +34,6 @@ urlpatterns = [
     path('registrygraph/', views.registry_graph, name='registry_graph'),
     path('classConcepts/', views.clasConcepts_graph, name='clasConcepts_graph'),
     path('upload/', views.upload_file, name='upload'),
+    path('search/', views.recherchePage, name='search'),
+    path('search/<str:text>', views.rechercheText, name='search'),
 ]
