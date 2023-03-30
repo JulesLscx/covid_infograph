@@ -1,5 +1,6 @@
 # ' -*- coding: utf-8 -*-
 import json
+import sys
 from variables import Keywords
 import pymongo as pm
 from openpyxl import load_workbook, Workbook
@@ -145,14 +146,14 @@ def init_collections():
         smc.get_db().create_collection(collection)
 
 
-def load_excel_file():
+def load_excel_file(file_name):
     try:
         file_dir = os.path.dirname(os.path.abspath(__file__))
     except NameError:
         file_dir = os.getcwd()
 
     file_path = os.path.join(
-        file_dir, 'excels', '20200601_IRIT_clinicalTrials+publications.xlsx')
+        file_dir, 'excels', file_name)
     try:
         workbook = load_workbook(filename=file_path)
         workbook.encoding = 'utf-8'
@@ -163,12 +164,12 @@ def load_excel_file():
     return workbook
 
 
-def dump_all_excel_in_mongo():
+def dump_all_excel_in_mongo(file_name):
     sheets = [Keywords.WS_CLINICALTRIALS_OBS.value, Keywords.WS_CLINICALTRIALS_RAND.value,
               Keywords.WS_PUBLICATION_OBS.value, Keywords.WS_PUBLICATION_RAND.value]
     collections = [Keywords.T_CLINICALTRIALS_OBS.value, Keywords.T_CLINICALTRIALS_RAND.value,
                    Keywords.T_PUBLICATION_OBS.value, Keywords.T_PUBLICATION_RAND.value]
-    workbook = load_excel_file()
+    workbook = load_excel_file(file_name)
     for i, sheet in enumerate(sheets):
         dic_list = create_dic_by_sheet(sheet_object=workbook[sheet])
         smc.get_db()[collections[i]].insert_many(dic_list, ordered=False)
@@ -185,13 +186,26 @@ def insert_one_dic_in_mongo(*, dic, collection):
 
 
 def __main__():
-    init_collections()
-    dump_all_excel_in_mongo()
+    file_name = sys.argv[1]
+    dump_all_excel_in_mongo(file_name)
     # test = create_dic_by_sheet(sheet_object=load_excel_file()[
     #                            Keywords.WS_CLINICALTRIALS_OBS.value])
 
 
 if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print('Usage: python3 database_add.py <file_name>')
+        print('File should be in the covid_infograph/files/excels folder')
+        sys.exit(1)
+    if not sys.argv[1].endswith('.xlsx'):
+        if sys.argv[1] == 'clean':
+            init_collections()
+            print('Database cleaned')
+            exit(0)
+        else:
+            print('File should be a .xlsx file or a command check the documentation')
+    if sys.argv[1] not in os.listdir(os.path.join(os.getcwd(), 'excels')):
+        print('File ' + sys.argv[1] + ' not found in the excels folder')
     __main__()
 
 # '''
