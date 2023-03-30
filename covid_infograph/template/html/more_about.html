@@ -1,5 +1,89 @@
 {% load static %}
 <link rel="stylesheet" href="{% static './css/style.css' %}">
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        text-decoration: none;
+        list-style: none;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    header,
+    footer {
+        margin: 0;
+    }
+
+    /*.sous-bloc:hover {
+    background-color: lightgray;
+    margin: 0;
+        
+  }*/
+
+    h2 {
+        background-color: #f3f3f3;
+        border-radius: 5px;
+    }
+
+    .bloc-info {
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    /* Style pour le corps de la page */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+
+    }
+
+    /* Style pour la navigation */
+    .bloc-info {
+        background-color: #fff;
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+        margin-right: 20px;
+        margin-left: 20px;
+        margin-top: 30px;
+
+    }
+
+    /* Style pour les titres de section */
+    h2 {
+        color: #333;
+        font-size: 24px;
+        margin-top: 20px;
+        padding: 5px 10px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        margin-bottom: 30px;
+    }
+
+    /* Style pour les paragraphes */
+    body>p {
+        color: #555;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    /* Style pour les liens */
+    body>a {
+        color: #008CBA;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    .bloc-info>div {
+        margin-bottom: 30px;
+    }
+</style>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 {% include 'accueil.html' %}
 
@@ -11,7 +95,7 @@
         <ul>
             <li> 01/06/2020 </li>
             <li>Collecte de notices bibliographiques (publications et essais cliniques) via Dimensions.ai </li>
-            <li> guillaume.cabanac@univ-tlse3.fr </li>
+            <li> <a href="mailto:guillaume.cabanac@univ-tlse3.fr">guillaume.cabanac@univ-tlse3.fr</a></li>
             <li> Équipe IRIS, IRIT UMR 5505, Université Paul Sabatier - Toulouse 3</li>
         </ul>
     </div>
