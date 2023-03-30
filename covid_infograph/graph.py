@@ -273,7 +273,7 @@ def Intervention_Drug_by_Date_graph():
         x='date',
         y='count',
         color='collection',
-        title='Nombre d\intervention de type Drug par dates'
+        title='Nombre d\'interventions de type Drug par dates'
     )
     end_date = "2020-12-31"
     start_date = "2020-01-01"

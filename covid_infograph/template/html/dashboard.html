@@ -2,6 +2,9 @@
 {% include 'accueil.html' %}
 
 {% block content %}
+<title>
+    Page d'accueil
+</title>
 <div class="date_sticky_picker">
     <form method="GET" action="{% url 'accueil' %}" class="month_picker">
         {{ form.as_p }}
