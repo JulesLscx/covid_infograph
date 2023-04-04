@@ -172,13 +172,22 @@ def dump_all_excel_in_mongo(file_name):
     workbook = load_excel_file(file_name)
     for i, sheet in enumerate(sheets):
         dic_list = create_dic_by_sheet(sheet_object=workbook[sheet])
-        smc.get_db()[collections[i]].insert_many(dic_list, ordered=False)
+        try:
+            smc.get_db()[collections[i]].insert_many(dic_list, ordered=False)
+        except Exception as e:
+            for dic in dic_list:
+                try:
+                    smc.get_db()[collections[i]].insert_one(dic)
+                except Exception as e:
+                    dic['id'] = dic['_id']
+                    dic.pop('_id')
+                    dic['error'] = str(e)
+                    smc.get_db()['errors'].insert_one(dic)
 
 
 def test_insert_one_dic_in_mongo():
     dic = create_dic_by_sheet(sheet_object=load_excel_file()[
                               Keywords.WS_CLINICALTRIALS_OBS.value])[1:10]
-    print(dic)
 
 
 def insert_one_dic_in_mongo(*, dic, collection):
@@ -204,13 +213,6 @@ if __name__ == '__main__':
             exit(0)
         else:
             print('File should be a .xlsx file or a command check the documentation')
-    if sys.argv[1] not in os.listdir(os.path.join(os.getcwd(), 'excels')):
+    if sys.argv[1] not in os.listdir(os.path.join(os.getcwd(), 'covid_infograph', 'files', 'excels')):
         print('File ' + sys.argv[1] + ' not found in the excels folder')
     __main__()
-
-# '''
- # File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.2288.0_x64__qbz5n2kfra8p0\lib\encodings\cp1252.py", line 19, in encode
-#    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-# UnicodeEncodeError: 'charmap' codec can't encode character '\u2265' in position 1404: character maps to <undefined>
-# How to solve this problem?
-# answer:
