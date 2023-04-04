@@ -1,0 +1,322 @@
+{% load static %}
+{% include 'accueil.html' %}
+{% block content %}
+<title>Manuel utilisateur</title>
+
+<body>
+
+    <h1>
+        Manuel utilisateur
+    </h1>
+    <main class="bloc-info">
+        <h2>Introduction</h2>
+        <p>
+            Ce manuel a pour but de vous guider dans l'utilisation de l'application web Covid-Infograph.
+        </p>
+        <h2>Présentation de l'application</h2>
+        <p>
+            L'application web Covid-Infograph a été développée dans le cadre d'un projet en BUT informatique de
+            l'Université
+            de Toulouse.
+            Voici le dépot GitHub du projet : <a href="https://github.com/JulesLscx/covid_infograph" target="_blank">
+                Repository GitHub
+            </a>
+        </p>
+        <p>
+            Cette application permet le reportinng d'articles et études scientifiques sur la COVID-19 (Pour plus de
+            détail
+            cliquez <a href="/readme">ici</a>).
+        </p>
+        <p>
+            L'application est composée de trois parties :
+        </p>
+        <ul>
+            <li>
+                Une partie de visualisation des données sous forme de graphiques. <a href="/">Voir plus</a>
+
+            </li>
+            <li>
+                Les données brutes que vous pouvez filtrez et télécharger. <a href="/display/1/0">1</a>
+                , <a href="/display/2/0">2</a>, <a href="/display/3/0">3 </a> , <a href="/display/4/0">4</a>
+            </li>
+            <li>
+                Et une partie moteur de recherche qui permet de rechercher parmis tous les titres de la base de données
+                (<a href="/search">ici</a>)
+            </li>
+        </ul>
+        <h2>Visualisation des données</h2>
+        <p>
+            La partie de visualisation des données est accessible depuis la page d'accueil de l'application.
+        </p>
+        <p>
+            L'utilisateur voit une multitude de graphiques sur son écran qui sont légendés et qui permettent de
+            visualiser
+            la répartition des données.
+            En haut de cette page, se trouve un champ nommé mois.
+            Ce champ doit être rempli de la manière suivante : MM-YYYY (ex: 01-2021 -> Janvier 2021).
+            Une fois le champ rempli, et l'utilisateur ayant validé sa saisie en cliquant sur le bouton submit, les 2
+            graphiques suivants s'actualisent avec les données du mois sélectionné :
+        <ul>
+            <li>
+                Le graphique nommé "Nombre de publications par concept clés"
+            </li>
+            <li>
+                Le graphique nommé "Nombre de données par revue"
+            </li>
+        </ul>
+        </p>
+        <h2>
+            Visualisation des données brutes
+        </h2>
+        <p>
+            Chaque table de la base de données à son onglet dans le menu en haut du site.
+            Une fois une des pages chargés (par exemple la page 1), l'utilisateur peut choisir de filtrer les données
+            affichés dans les champs de recherche.
+            Type de filtre :
+        <ul>
+            <li>
+                <b>Données exacte</b> : L'utilisateur doit saisir la valeur exacte de la donnée qu'il recherche.
+                (Souvent
+                sous forme de sélecteurs)
+                Pour les sélecteurs avec beaucoup de valeurs, le choix multiple est possible.
+            </li>
+            <li>
+                <b>Recherche partielle</b> : L'utilisateur peut saisir une partie de la donnée qu'il recherche. (Pour
+                les
+                champs textuels)
+            </li>
+            <li>
+                <b>Recherche par intervalle</b> : L'utilisateur peut saisir un intervalle de valeurs pour la donnée
+                qu'il
+                recherche. (Tous entêtes contenant 2 champs)
+            </li>
+            </p>
+            <h3>
+                Le tri
+            </h3>
+            <p>
+                Toutes les colonnes sauf les colonnes interventions et le sélecteur sont triables.
+                Pour trier une colonne, il suffit de cliquer sur le nom de la colonne.
+                Le tri est effectué par ordre croissant par défaut.
+                Pour trier par ordre décroissant, il suffit de cliquer une seconde fois sur le nom de la colonne.
+                Pour un tri multicolonne (tri sur plusieurs colonnes), il suffit de cliquer sur le nom de la colonne
+                supplémentaire en gardant la touche Ctrl ou Cmd enfoncée.
+            </p>
+            <h3>
+                Le téléchargement
+            </h3>
+            <p>
+                L'utilisateur à le choix entre plusieurs formats de téléchargement :
+            <ul>
+                <li>
+                    <b>CSV</b> : Format de fichier texte qui permet de stocker des données tabulaires.
+                </li>
+                <li>
+                    <b>JSON</b> : Format de fichier texte qui permet de stocker des données structurées.
+                </li>
+                <li>
+                    <b>HTML</b> : Format de fichier texte qui permet d'afficher les données dans un navigateur web sous
+                    forme de tableau.
+                </li>
+            </ul>
+            Attention, le téléchargement ne prend en compte que les lignes sélectionnées (càd première colonne cochée).
+            </p>
+            <h2>
+                Moteur de recherche
+            </h2>
+            <p>
+                Le moteur de recherche est accessible depuis le menu en haut du site.
+                L'utilisateur peut saisir une partie du titre de l'article qu'il recherche.
+                Une fois la saisie effectuée, l'utilisateur valide la saisie en appyuant sur la touche Entrée.
+                En dessous du champ le nombre de résultats est affiché.
+                Une fois la recherche effectuée, l'utilisateur voit une liste de résultats avec le titre, la date,
+                l'abstract et un lien vers l'article.
+            </p>
+            <section id="database">
+                <h2>
+                    Ajouter son excel dans la base de données
+                </h2>
+                <p>
+                    <b>(Permet aussi de lancer le site en local)</b>
+                </p>
+                <p>
+                    Pour ajouter son excel dans la base de données, il faut d'abord cloné le dépot GitHub du projet ou
+                    le
+                    télécharger en zip et le dézipper.
+                </p>
+                <p>
+                    Une fois le dépot cloné ou dézippé, il faut s'assurer d'avoir python (<a
+                        href="https://www.python.org/downloads/release/python-3100/">version 3.10
+                        mininum</a>) installé sur sa
+                    machine. Et avoir la bibliothèque pipenv installée.
+                </p>
+                <p>
+                    Pour installer pipenv, il faut ouvrir un terminal et taper la commande suivante :
+                </p>
+                <pre>
+                <code>
+                    pip install pipenv
+                </code>
+            </pre>
+                <p>
+                    Une fois pipenv installé, il faut se placer dans la racine du projet (Dossier contenant manage.py)
+                    et
+                    lancer la commande suivante qui installe les dépendances du projet :
+                </p>
+                <pre>
+                <code>
+                    python -m pipenv sync
+                </code>
+            </pre>
+                <p>
+                    Une fois les dépendances installées, il faut rentrer dans l'environnement virtuel du projet avec la
+                    commande suivante :
+                </p>
+                <pre>
+                <code>
+                    python -m pipenv shell
+                </code>
+            </pre>
+                <p>
+                    Une fois cela fait il faut mettre le excel dans le dossier excel du projet
+                    ('/covid_infograph/files/excel').
+                    Dès que le fichier se trouve dans le dossier vous pouvez lancer la commande suivante :
+                </p>
+                <pre>
+                <code>
+                    python .\covid_infograph\files\database_add.py [nom du fichier excel]
+                </code>
+            </pre>
+                <p>
+                    Une fois la commande lancée, le fichier excel est ajouté à la base de données.
+                </p>
+                <h3>
+                    Quelques commandes utiles
+                </h3>
+                <p>
+                    Pour quitter l'environnement virtuel du projet, il faut taper la commande suivante :
+                </p>
+                <pre>
+                <code>
+                    exit
+                </code>
+            </pre>
+                <p>
+                    Pour lancer le serveur de développement, il faut se placer dans la racine du projet et taper la
+                    commande suivante :
+                </p>
+                <pre>
+                <code>
+                    python manage.py runserver
+                </code>
+            </pre>
+                <p>
+                    Pour vider la base de données, il faut taper la commande suivante :
+                </p>
+                <pre>
+                <code>
+                    python .\covid_infograph\files\database_add.py clear
+                </code>
+            </pre>
+            </section>
+            <div>
+                Pour plus d'informations, envoyez nous un mail ou poser votre question dans un des issues du projet sur
+                <a href="https://github.com/JulesLscx/covid_infograph">GitHub</a>.
+            </div>
+    </main>
+</body>
+{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        text-decoration: none;
+        list-style: none;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    header,
+    footer {
+        margin: 0;
+    }
+
+    /*.sous-bloc:hover {
+background-color: lightgray;
+margin: 0;
+
+}*/
+
+    h2 {
+        background-color: #f3f3f3;
+        border-radius: 5px;
+    }
+
+    .bloc-info {
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    /* Style pour le corps de la page */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+
+    }
+
+    /* Style pour la navigation */
+    .bloc-info {
+        background-color: #fff;
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+        margin-right: 20px;
+        margin-left: 20px;
+        margin-top: 30px;
+
+    }
+
+    /* Style pour les titres de section */
+    h2 {
+        color: #333;
+        font-size: 24px;
+        margin-top: 20px;
+        padding: 5px 10px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        margin-bottom: 30px;
+    }
+
+    /* Style pour les paragraphes */
+    body>p {
+        color: #555;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    /* Style pour les liens */
+    body>a {
+        color: #008CBA;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    .bloc-info>div {
+        margin-bottom: 30px;
+    }
+
+    /*Space between paragraphs*/
+    p {
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% include 'footer.html' %}

@@ -29,4 +29,5 @@ urlpatterns = [
     path('search/', views.recherchePage, name='search'),
     path('search/<str:text>', views.rechercheText, name='search'),
     path('readme/', views.readme, name='readme'),
+    path('guide/', views.guide, name='guide'),
 ]

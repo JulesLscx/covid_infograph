@@ -17,6 +17,10 @@ from .graph import *
 from django.http import JsonResponse
 
 
+def guide(request):
+    return render(request, 'guide.html')
+
+
 def find_all(request, page, limit=100):
     if page == 1:
         value = Keywords.T_CLINICALTRIALS_OBS.value
